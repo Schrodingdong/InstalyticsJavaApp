@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Ring oval rectangle line-->
+<shape android:shape="rectangle"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <gradient
+        android:type="linear"
+        android:startColor="#FCAF45"
+        android:centerColor="#F56040"
+        android:endColor="#E1306C"
+        android:angle="45"/>
+
+
+
+
+
+</shape>

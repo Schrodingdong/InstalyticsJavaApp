@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding">10dp</dimen>
+    <dimen name="paddingAndCentering">35dp</dimen>
+
+    <dimen name="roundedCorners">15dp</dimen>
+
+    <dimen name="Spacing">21dp</dimen>
+    <dimen name="margin_Small">5dp</dimen>
+</resources>
