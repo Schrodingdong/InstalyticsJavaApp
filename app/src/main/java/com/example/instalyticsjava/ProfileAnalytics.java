@@ -32,10 +32,11 @@ import java.util.Map;
 public class ProfileAnalytics extends AppCompatActivity {
 
     String TAG = "ProfileAnalytics";
+    //charts
     private com.github.mikephil.charting.charts.BarChart profile_analytics_graph;
     private com.github.mikephil.charting.charts.LineChart followers_LineChart;
     private com.github.mikephil.charting.charts.LineChart trendline_analytics_chart;
-
+    //Profile Data
     private TextView avg_profile_views_value;
     private TextView avg_reach_value;
     private TextView avg_impressions_value;
@@ -43,15 +44,14 @@ public class ProfileAnalytics extends AppCompatActivity {
     private TextView deviation_profile_views_value;
     private TextView deviation_impressions_value;
     private TextView deviation_reach_value;
-
+    private TextView returning_users_value;
+    //Follower Data
     private TextView avg_follower_gain_value;
     private TextView deviation_follower_gain_value;
-
+    //Correlation
     private TextView corr_profileViews_impressions_value;
     private TextView corr_newReach_followerGain_value;
     private TextView corr_profileViews_followerGain_value;
-
-    private TextView returning_users_value;
 
 
 
@@ -90,27 +90,19 @@ public class ProfileAnalytics extends AppCompatActivity {
         }
 
 
-
-
     }
 
 
     private List<String> timeFetched;
-    private float barSpace = 0f;
-    private float groupSpace = 0.4f;
     @Override
     protected void onStart() {
         super.onStart();
         timeFetched = UtilFunctions.GetEndTimeList(DataSingelton.data);
 
-        //TODO Set data in charts
-        //profile data
-        SetProfileDataChart();
+        //TODO Setting data
         SetProfileDataText();
-
-        //for followers :
+        SetProfileDataChart();
         SetFollowersDataChart();
-
         SetTrendlineDataChart();
     }
 
@@ -138,6 +130,8 @@ public class ProfileAnalytics extends AppCompatActivity {
                                                                                                            DataSingelton.data.get("follower_gain"))*100));
     }
 
+    private float barSpace = 0f;
+    private float groupSpace = 0.4f;
     private void SetFollowersDataChart() {
         followers_LineChart.setData(UtilFunctions.getFollowersDataChartEntry(DataSingelton.data));//todo dont forget to change reach to followers in the function
         //for the X axis : ndiroha 3la 7ssab nhar :
@@ -199,21 +193,21 @@ public class ProfileAnalytics extends AppCompatActivity {
         int polynomialOrder;
         //TODO : profile views
         polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getMetricValueList(DataSingelton.data.get("profile_views")));
-        double[] coef_profileViews = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(DataSingelton.data.get("profile_views")),polynomialOrder);
+        double[] coef_profileViews = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(DataSingelton.data.get("profile_views")),3);
         rgb[0] = 255; rgb[1] = 179 ; rgb[2] = 215;
         SetLinedataSet(lineData, coef_profileViews,"Profile Views",rgb);
         Log.d(TAG, "SetTrendlineDataChart: profile_views order : "+polynomialOrder);
 
         //TODO : reach
         polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getMetricValueList(DataSingelton.data.get("reach")));
-        double[] coef_reach = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(DataSingelton.data.get("reach")),polynomialOrder);
+        double[] coef_reach = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(DataSingelton.data.get("reach")),3);
         rgb[0] = 224; rgb[1] = 179 ; rgb[2] = 255;
         SetLinedataSet(lineData, coef_reach,"Reach",rgb);
         Log.d(TAG, "SetTrendlineDataChart: reach order : "+polynomialOrder);
 
         //TODO : impressions
         polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getMetricValueList(DataSingelton.data.get("impressions")));
-        double[] coef_impressions = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(DataSingelton.data.get("impressions")),polynomialOrder);
+        double[] coef_impressions = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(DataSingelton.data.get("impressions")),3);
         Log.d(TAG, "SetTrendlineDataChart: impressions order : "+polynomialOrder);
         rgb[0] = 161; rgb[1] = 168 ; rgb[2] = 255;
         SetLinedataSet(lineData, coef_impressions,"Impressions",rgb);

@@ -1,9 +1,12 @@
 package com.example.instalyticsjava;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.sax.StartElementListener;
 import android.util.Log;
 import android.view.Window;
 import android.widget.TextView;
@@ -30,10 +33,12 @@ public class PostAnalytics extends AppCompatActivity {
     private TextView deviation_engagement_value;
     private TextView deviation_reach_value;
     private TextView deviation_impressions_value;
+    private TextView dominant_media_type_value;
 
     private TextView corr_reach_saved_value;
     private TextView corr_engagement_saved_value;
 
+    private TextView Hashtag_post_analytics_title;
     private com.github.mikephil.charting.charts.LineChart trendline_post_analytics_chart;
 
     private float barSpace = 0f;
@@ -49,13 +54,21 @@ public class PostAnalytics extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
         setPostDataChart();
         setPostDataAVGText();
-        setPostDataDevationText();
-        SetPostTrendlineDataChart();
-
+        setPostDataCorrText();
+        setPostTrendlineDataChart();
+        setHashtagSection();
     }
+
+    private void setHashtagSection() {
+        Hashtag_post_analytics_title = (TextView) findViewById(R.id.Hashtag_post_analytics_title);
+        Hashtag_post_analytics_title.setOnClickListener(view -> {
+            Intent intent = new Intent(this,HashtagList.class);
+            startActivity(intent);
+        });
+    }
+
     private void setPostDataChart(){
         //plot the last 10 posts
         post_analytics_graph = (com.github.mikephil.charting.charts.BarChart) findViewById(R.id.post_analytics_graph);
@@ -97,6 +110,7 @@ public class PostAnalytics extends AppCompatActivity {
         deviation_engagement_value = (TextView) findViewById(R.id.deviation_engagement_value);
         deviation_reach_value = (TextView) findViewById(R.id.deviation_reach_value);
         deviation_impressions_value = (TextView) findViewById(R.id.deviation_impressions_value);
+        dominant_media_type_value = (TextView) findViewById(R.id.dominant_media_type_value);
 
         avg_engagement_value.setText(String.format("%.1f",UtilFunctions.getPostAVGof("engagement")));
         avg_reach_value.setText(String.format("%.1f",UtilFunctions.getPostAVGof("reach")));
@@ -105,15 +119,16 @@ public class PostAnalytics extends AppCompatActivity {
         deviation_engagement_value.setText(String.format("%.1f",UtilFunctions.getPostDeviationPercentage("engagement")*100) + "%");
         deviation_reach_value.setText(String.format("%.1f",UtilFunctions.getPostDeviationPercentage("reach")*100) + "%");
         deviation_impressions_value.setText(String.format("%.1f",UtilFunctions.getPostDeviationPercentage("impressions")*100) + "%");
+        dominant_media_type_value.setText(UtilFunctions.getPredominantMediaType());
     }
-    private void setPostDataDevationText(){
+    private void setPostDataCorrText(){
         corr_reach_saved_value = (TextView) findViewById(R.id.corr_reach_saved_value);
         corr_engagement_saved_value = (TextView) findViewById(R.id.corr_engagement_saved_value);
 
         corr_reach_saved_value.setText(String.format("%.1f",UtilFunctions.getPostCorrelationOf("reach","saved")*100) + "%");
         corr_engagement_saved_value.setText(String.format("%.1f",UtilFunctions.getPostCorrelationOf("engagement","reach")*100) + "%");
     }
-    private void SetPostTrendlineDataChart(){
+    private void setPostTrendlineDataChart(){
         trendline_post_analytics_chart = (com.github.mikephil.charting.charts.LineChart) findViewById(R.id.trendline_post_analytics_chart);
         //todo ADD THE BIC TO GET THE PERFECT POLYNOMIAL ORDER
         LineData lineData = new LineData();
@@ -124,21 +139,21 @@ public class PostAnalytics extends AppCompatActivity {
         int polynomialOrder;
         //TODO : engagement
         polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getPostMetricValueList("engagement"));
-        double[] coef_profileViews = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getPostMetricValueList("engagement"),polynomialOrder);
+        double[] coef_profileViews = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getPostMetricValueList("engagement"),3);
         rgb[0] = 255; rgb[1] = 179 ; rgb[2] = 215;
         SetLinedataSet(lineData, coef_profileViews,"Profile Views",rgb);
         Log.d(TAG, "SetPostTrendlineDataChart: profile_views order : "+polynomialOrder);
 
         //TODO : reach
         polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getPostMetricValueList("reach"));
-        double[] coef_reach = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getPostMetricValueList("reach"),polynomialOrder);
+        double[] coef_reach = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getPostMetricValueList("reach"),3);
         rgb[0] = 224; rgb[1] = 179 ; rgb[2] = 255;
         SetLinedataSet(lineData, coef_reach,"Reach",rgb);
-        Log.d(TAG, "SetPostTrendlineDataChart: reach order : "+polynomialOrder);
+        Log.d(TAG, "SetPostTrendlineDataChart: reach order : "+3);
 
         //TODO : impressions
         polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getPostMetricValueList("impressions"));
-        double[] coef_impressions = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getPostMetricValueList("impressions"),polynomialOrder);
+        double[] coef_impressions = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getPostMetricValueList("impressions"),3);
         rgb[0] = 161; rgb[1] = 168 ; rgb[2] = 255;
         SetLinedataSet(lineData, coef_impressions,"Impressions",rgb);
         Log.d(TAG, "SetPostTrendlineDataChart: impressions order : "+polynomialOrder);

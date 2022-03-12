@@ -11,19 +11,24 @@
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/core_app_top_handle.xml" value="0.228" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/core_mask_profile_picture.xml" value="0.228" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/core_profile_picture_outline.xml" value="0.228" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/hashtag_background.xml" value="0.1" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2155" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/loggin_screen_bg.xml" value="0.2155" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/loggin_screen_top_button.xml" value="0.228" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/recycler_hashtag_background.xml" value="0.1455" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/section_fill.xml" value="0.1485" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/section_fill_account.xml" value="0.2155" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/top_handle.xml" value="0.2155" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_core.xml" value="0.33" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_hashtag_list.xml" value="0.21" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_hastag_list.xml" value="0.33" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_loading_data.xml" value="0.14703425229741018" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_logging.xml" value="0.30085470085470084" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_main.xml" value="0.22" />
-        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_post_analytics.xml" value="0.3009833262077811" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_post_analytics.xml" value="0.25" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_profile_analytics.xml" value="0.33" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_splash_screen.xml" value="0.30085470085470084" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/recycler_hashtag_row.xml" value="0.33" />
       </map>
     </option>
   </component>

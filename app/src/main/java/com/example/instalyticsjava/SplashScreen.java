@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Window;
 
 import com.facebook.AccessToken;
+import com.facebook.core.Core;
 
 public class SplashScreen extends AppCompatActivity {
     private final String TAG = "SplashScreen";
@@ -19,27 +20,42 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
     }
 
+
     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(TAG, "onStart: "+AccessToken.getCurrentAccessToken().getToken());
-        try {
-            if (AccessToken.getCurrentAccessToken().getToken() != null ){
-                //Go to main core
-                Log.d(TAG, "onStart: "+AccessToken.getCurrentAccessToken());
-                Intent intent = new Intent(this, CoreActivity.class);
-                startActivity(intent);
-                finish();
-            }
-            else{
-                Log.d(TAG, "onStart: "+AccessToken.getCurrentAccessToken());
-                Intent intent = new Intent(this, LoggingActivity.class);
-                startActivity(intent);
-                finish();
-            }
+    protected void onResume() {
+        super.onResume();
+        Intent intentCore = new Intent(this, CoreActivity.class);
+        Intent intentLogging = new Intent(this, LoggingActivity.class);
+        new GotoNextActivity(intentCore,intentLogging).start();
+    }
+
+    class GotoNextActivity extends Thread {
+        final Intent intentCore;
+        final Intent intentLogging;
+        public GotoNextActivity(Intent intentCore,Intent intentLogging){
+            this.intentCore = intentCore;
+            this.intentLogging = intentLogging;
         }
-        catch (NullPointerException  e ){
-            Log.e("onStart", "onStart: ", e);
+        @Override
+        public void run() {
+            Log.d(TAG, "onStart: "+AccessToken.getCurrentAccessToken());
+            try {
+                Thread.sleep(3000);
+                if (AccessToken.getCurrentAccessToken() != null ){
+                    //Go to main core
+                    Log.d(TAG, "goto core: "+AccessToken.getCurrentAccessToken());
+                    startActivity(intentCore);
+                    finish();
+                }
+                else{
+                    Log.d(TAG, "goto log: "+AccessToken.getCurrentAccessToken());
+                    startActivity(intentLogging);
+                    finish();
+                }
+            }
+            catch (NullPointerException | InterruptedException e ){
+                Log.e("onStart", "onStart: ", e);
+            }
         }
     }
 }

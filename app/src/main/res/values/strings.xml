@@ -3,4 +3,6 @@
 
     <string name="facebook_app_id">230544005910820</string>
     <string name="fb_login_protocol_scheme">fb230544005910820</string>
+
+    <string name="textSize">14sp</string>
 </resources>

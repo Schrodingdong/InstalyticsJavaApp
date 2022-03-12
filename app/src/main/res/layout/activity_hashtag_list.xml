@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HashtagList"
+    android:background="@drawable/app_background">
+
+    <!--    TODO: Top Handle-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top_handle_widget"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:background="@drawable/core_app_top_handle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/instalytics"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+
+            android:fontFamily="cursive"
+            android:text="Instalytics"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="40dp"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/recycler_layout"
+        android:layout_width="match_parent"
+        android:layout_height="700dp"
+        android:padding="@dimen/padding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_handle_widget" >
+        <TextView
+            android:id="@+id/Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_Small"
+            android:layout_marginHorizontal="@dimen/margin_Small"
+            android:background="@drawable/core_app_section_fill"
+            android:padding="@dimen/padding"
+            android:text="HASHTAG &amp; TOTAL ENGAGEMENT"
+            android:textColor="@color/Text"
+            android:textSize="20dp"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@id/hashtag_recycler"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/hashtag_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="600dp"
+            android:layout_margin="@dimen/margin_Small"
+            android:layout_marginHorizontal="@dimen/margin_Small"
+            android:background="@drawable/core_app_section_fill"
+            android:padding="@dimen/padding"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Title" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

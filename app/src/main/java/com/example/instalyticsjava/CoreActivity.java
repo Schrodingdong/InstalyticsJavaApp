@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
@@ -43,6 +44,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,27 +52,21 @@ import java.util.List;
 import java.util.Map;
 
 public class CoreActivity extends AppCompatActivity {
-    private String TAG ="CoreActivity";
+    private final String TAG ="CoreActivity";
 
-    private Button logOutButton;
-    private UtilFunctions myUtils = new UtilFunctions();
+    private DataSingelton data;
     //references in XML
-    private ProgressBar spinner;
-    private ConstraintLayout MainContent;
     private TextView accountUsername;
     private TextView accountName;
     private ImageView accountProfilePicture;
-
+    private Button logOutButton;
     //profile brief
     private Button ProfileBriefNameButton;
     private com.github.mikephil.charting.charts.BarChart profile_brief_barChart;
-
     private TextView avgProfileViews;
     private TextView reachPercentage;
     private TextView avg_follower_gain_value;
-
     private TextView ConsistencyReach;
-
     //post brief
     private Button PostBriefNameButton;
     private com.github.mikephil.charting.charts.BarChart posts_brief_graph;
@@ -87,29 +83,22 @@ public class CoreActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Get rid of title bar SHOULD BE ON TOP OF THE PROGRAM
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_core);
-        DataSingelton randomInstance;
+
 
         //profile name username picture
         accountUsername = (TextView) findViewById(R.id.AccountUsername);
         accountName = (TextView) findViewById(R.id.AccountName);
         accountProfilePicture = (ImageView) findViewById(R.id.AccountPictureInner);
 
-        //dial chargement
-        spinner = (ProgressBar)findViewById(R.id.progressBar1);
-        MainContent = (ConstraintLayout)findViewById(R.id.scrollable_area);
 
-        //profilebrief
+        //profile brief
         ProfileBriefNameButton = (Button) findViewById(R.id.ProfileBrief_Name_button);
-        ProfileBriefNameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(CoreActivity.this, ProfileAnalytics.class);
-                startActivity(intent);
-            }
+        ProfileBriefNameButton.setOnClickListener(view -> {
+            Intent intent = new Intent(CoreActivity.this, ProfileAnalytics.class);
+            startActivity(intent);
         });
         profile_brief_barChart = (com.github.mikephil.charting.charts.BarChart) findViewById(R.id.profile_brief_graph);
         profile_brief_barChart.setNoDataText("No Data Available :(");
@@ -119,16 +108,13 @@ public class CoreActivity extends AppCompatActivity {
 
 
         //postBriefs :
+        PostBriefNameButton = (Button) findViewById(R.id.posts_brief_Name_button);
+        PostBriefNameButton.setOnClickListener(view -> {
+            Intent intent = new Intent(CoreActivity.this, PostAnalytics.class);
+            startActivity(intent);
+        });
         posts_brief_graph = (com.github.mikephil.charting.charts.BarChart) findViewById(R.id.posts_brief_graph);
         posts_brief_graph.setNoDataText("No Data Available :(");
-        PostBriefNameButton = (Button) findViewById(R.id.posts_brief_Name_button);
-        PostBriefNameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(CoreActivity.this, PostAnalytics.class);
-                startActivity(intent);
-            }
-        });
         goto_post1 = (Button) findViewById(R.id.goto_post1);
         goto_post2 = (Button) findViewById(R.id.goto_post2);
         goto_post3 = (Button) findViewById(R.id.goto_post3);
@@ -146,72 +132,124 @@ public class CoreActivity extends AppCompatActivity {
 
         //log out
         logOutButton = findViewById(R.id.logout_button_core);
-        logOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LoginManager.getInstance().logOut();
-                Intent intent = new Intent(CoreActivity.this, LoggingActivity.class);
-                startActivity(intent);
-                DataSingelton.ResetData();
-                Log.d(TAG, "onClick: data after reset : "+DataSingelton.data);
-                finish();
-            }
-        });
+        logOutButton.setOnClickListener(view -> LogOut());
     }
-
     @Override
     protected void onStart() {
         super.onStart();
-        if (!DataSingelton.finishedDataInit || !DataSingelton.finishedProfileDataInit || !DataSingelton.finishedDataPostsInit
-                || !DataSingelton.finishedLifetimeDataInit_audiencecountry || !DataSingelton.finishedLifetimeDataInit_onlinefollowers){
-            spinner.setVisibility(View.VISIBLE);
-            MainContent.setVisibility(View.GONE);
+        if (!(DataSingelton.finishedDataInit &&
+                DataSingelton.finishedProfileDataInit &&
+                DataSingelton.finishedDataPostsInit &&
+                DataSingelton.finishedLifetimeDataInit_audiencecountry &&
+                DataSingelton.finishedLifetimeDataInit_onlinefollowers)){
             Intent intent = new Intent(this, FetchData.class);
-            startService(intent);
+            new waitForData(intent).start();
         }
-        waitForData();
-
-
     }
 
+    private void LogOut() {
+        LoginManager.getInstance().logOut();
+        Intent intent = new Intent(CoreActivity.this, LoggingActivity.class);
+        startActivity(intent);
+        DataSingelton.ResetData();
+        Log.d(TAG, "onClick: data after reset : "+DataSingelton.data);
+        finish();
+    }
+
+    //TODO add a "sorry we werent able to connect :/
+    private class waitForData extends Thread {
+        private final int time_limit = 10000;
+        private int timer = 0;
+        private final ProgressBar spinner;
+        private final ConstraintLayout MainContent;
+        private final Intent fetchIntent;
+
+        public waitForData(Intent fetchIntent){
+            this.fetchIntent = fetchIntent;
+            spinner = (ProgressBar)findViewById(R.id.progressBar1);
+            MainContent = (ConstraintLayout)findViewById(R.id.scrollable_area);
+            spinner.setVisibility(View.VISIBLE);
+            MainContent.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void run() {
+            startService(fetchIntent);
+            Log.d(TAG, "onStart: started service");
+            while(!((DataSingelton.finishedDataInit &&
+                    DataSingelton.finishedProfileDataInit &&
+                    DataSingelton.finishedDataPostsInit &&
+                    DataSingelton.finishedLifetimeDataInit_audiencecountry &&
+                    DataSingelton.finishedLifetimeDataInit_onlinefollowers) ||
+                    ++timer == time_limit)) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }}
+            if(timer >= time_limit) LogOut();
+            else{
+                FetchData.stopService();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        SetProfileNameUsernamePicture();
+                        SetProfileBriefData();
+                        SetLast5Posts();
+                        //Set data in Interpretation :
+                        ConsistencyReach.setText(String.format("%.1f %%",UtilFunctions.getConsistencyOf(DataSingelton.data.get("profile_views"))*100));
+
+                        spinner.setVisibility(View.GONE);
+                        MainContent.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        }
+    }
 
     private float barSpace = 0f;
     private float groupSpace = 0.4f;
-
-    //TODO add a "sorry we werent able to connect :/
-    private void waitForData() {
-        final Handler handler = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (DataSingelton.finishedDataInit && DataSingelton.finishedProfileDataInit && DataSingelton.finishedDataPostsInit
-                        && DataSingelton.finishedLifetimeDataInit_audiencecountry && DataSingelton.finishedLifetimeDataInit_onlinefollowers){
-                    FetchData.stopService();
-//                    Log.d(TAG, "run: FINISHED : " + DataSingelton.data);
-//                    Log.d(TAG, "run: FINISHED : " + DataSingelton.ig_post_data_insights);
-//                    Log.d(TAG, "run: FINISHED : " + DataSingelton.ig_post_data);
-                    SetProfileNameUsernamePicture();
-                    spinner.setVisibility(View.GONE);
-                    MainContent.setVisibility(View.VISIBLE);
-
-                    //TODO Set data in PROFILE charts
-                    SetProfileBriefData();
-                    //TODO fetch data of last 5 posts
-                    SetLast5Posts();
-                    //TODO Set data in Interpretation :
-                    ConsistencyReach.setText(String.format("%.1f %%",UtilFunctions.getConsistencyOf(DataSingelton.data.get("profile_views"))*100));
-                }
-                else {
-                    waitForData();
-                }
-            }
-        };
-        handler.postDelayed(runnable,1);
+    private void SetProfileNameUsernamePicture() {
+        accountUsername.setText(DataSingelton.ig_username);
+        accountName.setText(DataSingelton.ig_name);
+        accountProfilePicture.setImageBitmap(DataSingelton.ig_BITMAPprofilePictureURL);
     }
+    private void SetProfileBriefData() {
+        //for profile Brief :
+        profile_brief_barChart.setData(UtilFunctions.getProfileDataChartEntry(DataSingelton.data));
+        //for the X axis : ndiroha 3la 7ssab nhar :
+        profile_brief_barChart.getAxisRight().setEnabled(false);
+        List<String> timeFetched = UtilFunctions.GetEndTimeList(DataSingelton.data);
+        //Log.d(TAG, "run: size timefetched : "+timeFetched.size());
+        XAxis profile_Xaxis = profile_brief_barChart.getXAxis();
+        profile_Xaxis.setValueFormatter(new IndexAxisValueFormatter(timeFetched));
+        profile_Xaxis.setCenterAxisLabels(true);
+        profile_Xaxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        profile_Xaxis.setGranularity(1);
+        profile_Xaxis.setGranularityEnabled(true);
+        profile_Xaxis.setDrawGridLines(false);
+        profile_Xaxis.setAxisMinimum(0);
+        profile_Xaxis.setAxisMaximum(timeFetched.size());
+        profile_brief_barChart.setVisibleXRange(1,timeFetched.size());
+        profile_brief_barChart.setVisibleXRangeMaximum(5);
+        profile_brief_barChart.setVisibleXRangeMinimum(1);
+        profile_brief_barChart.groupBars(0,groupSpace,barSpace);
+        profile_brief_barChart.setDragEnabled(true);
+        profile_brief_barChart.setSelected(false);
+        profile_brief_barChart.setPinchZoom(false);
+        profile_brief_barChart.setScaleEnabled(false);
+        profile_brief_barChart.getDescription().setEnabled(false);
+        profile_brief_barChart.animateY(1300, Easing.EaseOutQuart);
+        profile_brief_barChart.invalidate();
+        //set the text :
+        avgProfileViews.setText(String.format("%.1f",UtilFunctions.getAVGof(DataSingelton.data.get("profile_views"))));
+        reachPercentage.setText(String.format("%.1f",UtilFunctions.getReachPercentage(DataSingelton.data)*100) + "%");
+        avg_follower_gain_value.setText(String.format("%.1f%%",UtilFunctions.getAVGof(DataSingelton.data.get("follower_gain"))));
 
+    }
     private void SetLast5Posts() {
         //for profile Brief :
-        posts_brief_graph.setData(UtilFunctions.getTop5PostsDataChartEntry(DataSingelton.ig_post_data,DataSingelton.ig_post_data_insights));
+        posts_brief_graph.setData(UtilFunctions.getTop5PostsDataChartEntry());
         //for the X axis : ndiroha 3la 7ssab nhar :
         posts_brief_graph.getAxisRight().setEnabled(false);
         //List<String> PostID = UtilFunctions.getTop5Posts();
@@ -257,7 +295,7 @@ public class CoreActivity extends AppCompatActivity {
         goto_post2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri uri = Uri.parse(top5PostsURL.get(1)); // missing 'http://' will cause crashed
+                Uri uri = Uri.parse(top5PostsURL.get(1));
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
@@ -265,7 +303,7 @@ public class CoreActivity extends AppCompatActivity {
         goto_post3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri uri = Uri.parse(top5PostsURL.get(2)); // missing 'http://' will cause crashed
+                Uri uri = Uri.parse(top5PostsURL.get(2));
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
@@ -273,7 +311,7 @@ public class CoreActivity extends AppCompatActivity {
         goto_post4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri uri = Uri.parse(top5PostsURL.get(3)); // missing 'http://' will cause crashed
+                Uri uri = Uri.parse(top5PostsURL.get(3));
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
@@ -281,7 +319,7 @@ public class CoreActivity extends AppCompatActivity {
         goto_post5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri uri = Uri.parse(top5PostsURL.get(4)); // missing 'http://' will cause crashed
+                Uri uri = Uri.parse(top5PostsURL.get(4));
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
@@ -293,46 +331,5 @@ public class CoreActivity extends AppCompatActivity {
         avg_impressions_value.setText(String.format("%.1f",UtilFunctions.getPostAVGof("impressions")));
         reach_percentage_post_value.setText(String.format("%.1f",UtilFunctions.getPostReachPercentage()*100) + "%");
     }
-
-    private void SetProfileNameUsernamePicture() {
-        accountUsername.setText(DataSingelton.ig_username);
-        accountName.setText(DataSingelton.ig_name);
-        accountProfilePicture.setImageBitmap(DataSingelton.ig_BITMAPprofilePictureURL);
-    }
-
-    private void SetProfileBriefData() {
-        //for profile Brief :
-        profile_brief_barChart.setData(UtilFunctions.getProfileDataChartEntry(DataSingelton.data));
-        //for the X axis : ndiroha 3la 7ssab nhar :
-        profile_brief_barChart.getAxisRight().setEnabled(false);
-        List<String> timeFetched = UtilFunctions.GetEndTimeList(DataSingelton.data);
-        //Log.d(TAG, "run: size timefetched : "+timeFetched.size());
-        XAxis profile_Xaxis = profile_brief_barChart.getXAxis();
-        profile_Xaxis.setValueFormatter(new IndexAxisValueFormatter(timeFetched));
-        profile_Xaxis.setCenterAxisLabels(true);
-        profile_Xaxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        profile_Xaxis.setGranularity(1);
-        profile_Xaxis.setGranularityEnabled(true);
-        profile_Xaxis.setDrawGridLines(false);
-        profile_Xaxis.setAxisMinimum(0);
-        profile_Xaxis.setAxisMaximum(timeFetched.size());
-        profile_brief_barChart.setVisibleXRange(1,timeFetched.size());
-        profile_brief_barChart.setVisibleXRangeMaximum(5);
-        profile_brief_barChart.setVisibleXRangeMinimum(1);
-        profile_brief_barChart.groupBars(0,groupSpace,barSpace);
-        profile_brief_barChart.setDragEnabled(true);
-        profile_brief_barChart.setSelected(false);
-        profile_brief_barChart.setPinchZoom(false);
-        profile_brief_barChart.setScaleEnabled(false);
-        profile_brief_barChart.getDescription().setEnabled(false);
-        profile_brief_barChart.animateY(1300, Easing.EaseOutQuart);
-        profile_brief_barChart.invalidate();
-        //set the text :
-        avgProfileViews.setText(String.format("%.1f",UtilFunctions.getAVGof(DataSingelton.data.get("profile_views"))));
-        reachPercentage.setText(String.format("%.1f",UtilFunctions.getReachPercentage(DataSingelton.data)*100) + "%");
-        avg_follower_gain_value.setText(String.format("%.1f%%",UtilFunctions.getAVGof(DataSingelton.data.get("follower_gain"))));
-
-    }
-
 
 }
