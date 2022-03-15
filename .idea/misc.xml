@@ -15,20 +15,29 @@
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2155" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/loggin_screen_bg.xml" value="0.2155" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/loggin_screen_top_button.xml" value="0.228" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/popup_block.xml" value="0.2735" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/recycler_detail_table.xml" value="0.225" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/recycler_hashtag_background.xml" value="0.1455" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/section_fill.xml" value="0.1485" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/section_fill_account.xml" value="0.2155" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/drawable/top_handle.xml" value="0.2155" />
-        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_core.xml" value="0.33" />
-        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_hashtag_list.xml" value="0.21" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_core.xml" value="0.25" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_hashtag_list.xml" value="0.33" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_hastag_list.xml" value="0.33" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_interpretation.xml" value="0.33" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_interpretation_update_popup.xml" value="0.14709569577935647" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_loading_data.xml" value="0.14703425229741018" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_logging.xml" value="0.30085470085470084" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_post_analytics.xml" value="0.25" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_profile_analytics.xml" value="0.33" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/activity_splash_screen.xml" value="0.30085470085470084" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/popup_detail_table_reset.xml" value="0.25" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/popup_detail_table_update.xml" value="0.33" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/popup_details_table_add.xml" value="0.27787851314596557" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/recycler_detail_table.xml" value="0.4061078622482131" />
         <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/layout/recycler_hashtag_row.xml" value="0.33" />
+        <entry key="..\:/Users/Hamza/AndroidStudioProjects/InstalyticsJava/app/src/main/res/menu/recylcer_detail_table_popup_menu_on_longpress.xml" value="0.3009833262077811" />
       </map>
     </option>
   </component>

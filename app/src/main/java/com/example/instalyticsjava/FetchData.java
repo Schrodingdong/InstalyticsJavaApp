@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class FetchData extends IntentService {
     private final String TAG = "FetchData";
@@ -42,8 +43,8 @@ public class FetchData extends IntentService {
         return super.onStartCommand(intent, flags, startId);
     }
     public static void stopService() {
-        if (isRunning && DataSingelton.finishedDataInit && DataSingelton.finishedProfileDataInit && DataSingelton.finishedDataPostsInit
-        && DataSingelton.finishedLifetimeDataInit_audiencecountry && DataSingelton.finishedLifetimeDataInit_onlinefollowers){
+        if (isRunning && DataSingelton.isFinishedDataInit() && DataSingelton.isFinishedProfileDataInit() && DataSingelton.isFinishedDataPostsInit()
+        && DataSingelton.isFinishedLifetimeDataInit_audiencecountry() && DataSingelton.isFinishedLifetimeDataInit_onlinefollowers()){
             isRunning = false;
             instance.stopSelf();
         }
@@ -54,11 +55,11 @@ public class FetchData extends IntentService {
             while(isRunning){
                 Log.d("FetchData", "service is running ...");
                 Log.d(TAG, "onHandleIntent: "+isRunning+" && "+
-                        DataSingelton.finishedDataInit +" && "+
-                        DataSingelton.finishedProfileDataInit +" && "+
-                        DataSingelton.finishedDataPostsInit +" && "+
-                        DataSingelton.finishedLifetimeDataInit_audiencecountry +" && "+
-                        DataSingelton.finishedLifetimeDataInit_onlinefollowers);
+                        DataSingelton.isFinishedDataInit() +" && "+
+                        DataSingelton.isFinishedProfileDataInit() +" && "+
+                        DataSingelton.isFinishedDataPostsInit() +" && "+
+                        DataSingelton.isFinishedLifetimeDataInit_audiencecountry() +" && "+
+                        DataSingelton.isFinishedLifetimeDataInit_onlinefollowers());
                 Thread.sleep(2000);
             }
         }catch (InterruptedException e){
@@ -84,16 +85,17 @@ public class FetchData extends IntentService {
                                         public void onCompleted(@NonNull GraphResponse graphResponse) {
                                             JSONObject JSONInstaID = graphResponse.getJSONObject();
                                             try {
+                                                assert JSONInstaID != null;
                                                 JSONObject jsonRelated_Pages = JSONInstaID.getJSONObject("instagram_business_account");
                                                 DataSingelton.setInstagramBusinessAccountID(jsonRelated_Pages.get("id").toString());
 
-                                                //get the analytics
-                                                GetAnalytics(DataSingelton.getInstagramBusinessAccountID());
-                                                GetAnalyticsLifetime_OnlineFollowers(DataSingelton.getInstagramBusinessAccountID());
-                                                GetAnalyticsLifetime_AudienceCountry(DataSingelton.getInstagramBusinessAccountID());
+                                                //for profile
+                                                getProfileData(DataSingelton.getInstagramBusinessAccountID());
+                                                getProfileAnalyticsData(DataSingelton.getInstagramBusinessAccountID());
+                                                getAnalyticsLifetime_OnlineFollowers(DataSingelton.getInstagramBusinessAccountID());
+                                                getAnalyticsLifetime_AudienceCountry(DataSingelton.getInstagramBusinessAccountID());
                                                 //for posts :
-                                                GetPostIDs(DataSingelton.getInstagramBusinessAccountID());
-                                                GetNameUsernameProfilePicture(DataSingelton.getInstagramBusinessAccountID());
+                                                getPostIDs(DataSingelton.getInstagramBusinessAccountID());
 
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -117,24 +119,39 @@ public class FetchData extends IntentService {
 
     @NonNull
     private String getFacebookPageID(@Nullable JSONObject jsonObject) throws JSONException {
+        assert jsonObject != null;
         JSONObject accounts = jsonObject.getJSONObject("accounts");
         JSONArray related_Pages = accounts.getJSONArray("data");
         JSONObject InstaObject = related_Pages.getJSONObject(0);                                                //recheck had zmr
-        String Insta_Id = InstaObject.getString("id");
-        return Insta_Id;
+        return InstaObject.getString("id");
     }
-    private void GetAnalytics(String ID){
+    private void getProfileData(String ID) {
+        GraphRequest graphRequest = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(),
+                ID,
+                new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(@NonNull GraphResponse graphResponse) {
+                        JSONObject smallData = graphResponse.getJSONObject();
+                        if (smallData != null) createProfileData(smallData);
+                    }
+                });
+        Bundle bundle = new Bundle();
+        bundle.putString("fields","profile_picture_url,username,name,followers_count");
+        graphRequest.setParameters(bundle);
+        graphRequest.executeAsync(); //on a seprate thread in the background
+    }
+    private void getProfileAnalyticsData(String ID){
         //set a new request :
         GraphRequest graphRequest = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(),
                 ID+"/insights",
                 new GraphRequest.Callback() {
                     @Override
                     public void onCompleted(@NonNull GraphResponse graphResponse) {
-                        JSONObject BigData = graphResponse.getJSONObject();
-                        if (BigData == null) return;
+                        JSONObject response = graphResponse.getJSONObject();
+                        if (response == null) return;
                         try {
                             //Data list li fiha kulchi : JSONArray retrievedData
-                            CreateData(BigData.getJSONArray("data"));
+                            CreateData(response.getJSONArray("data"));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -151,16 +168,18 @@ public class FetchData extends IntentService {
         graphRequest.setParameters(bundle);
         graphRequest.executeAsync(); //on a seprate thread in the background
     }
-    private void GetAnalyticsLifetime_OnlineFollowers(String ID){
+    private void getAnalyticsLifetime_OnlineFollowers(String ID){
         //set a new request :
         GraphRequest graphRequest = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(),
                 ID+"/insights",
                 new GraphRequest.Callback() {
                     @Override
                     public void onCompleted(@NonNull GraphResponse graphResponse) {
-                        JSONObject BigData = graphResponse.getJSONObject();
+                        JSONObject response = graphResponse.getJSONObject();
+                        Log.d(TAG, "getAnalyticsLifetime_OnlineFollowers: "+response);
                         try {
-                            CreateLifetimeData_OnlineFollowers(BigData.getJSONArray("data"));
+                            assert response != null;
+                            CreateLifetimeData_OnlineFollowers(response.getJSONArray("data"));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -176,16 +195,18 @@ public class FetchData extends IntentService {
         graphRequest.setParameters(bundle);
         graphRequest.executeAsync(); //on a seprate thread in the background
     }
-    private void GetAnalyticsLifetime_AudienceCountry(String ID){
+    private void getAnalyticsLifetime_AudienceCountry(String ID){
         //set a new request :
         GraphRequest graphRequest = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(),
                 ID+"/insights",
                 new GraphRequest.Callback() {
                     @Override
                     public void onCompleted(@NonNull GraphResponse graphResponse) {
-                        JSONObject BigData = graphResponse.getJSONObject();
+                        JSONObject response = graphResponse.getJSONObject();
+                        Log.d(TAG, "getAnalyticsLifetime_AudienceCountry: "+response);
                         try {
-                            CreateLifetimeData_AudienceCountry(BigData.getJSONArray("data"));
+                            assert response != null;
+                            CreateLifetimeData_AudienceCountry(response.getJSONArray("data"));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -198,37 +219,24 @@ public class FetchData extends IntentService {
         graphRequest.setParameters(bundle);
         graphRequest.executeAsync(); //on a seprate thread in the background
     }
-    private void GetNameUsernameProfilePicture(String ID) {
+    
+    private void getPostIDs(String ID){
         GraphRequest graphRequest = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(),
                 ID,
                 new GraphRequest.Callback() {
                     @Override
                     public void onCompleted(@NonNull GraphResponse graphResponse) {
-                        JSONObject smallData = graphResponse.getJSONObject();
-                        if (smallData != null) CreateNameUsernameProfilePictureData(smallData);
-                    }
-                });
-        Bundle bundle = new Bundle();
-        bundle.putString("fields","profile_picture_url,username,name");
-        graphRequest.setParameters(bundle);
-        graphRequest.executeAsync(); //on a seprate thread in the background
-    }
-
-    private void GetPostIDs(String ID){
-        GraphRequest graphRequest = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(),
-                ID,
-                new GraphRequest.Callback() {
-                    @Override
-                    public void onCompleted(@NonNull GraphResponse graphResponse) {
+                        JSONObject response = graphResponse.getJSONObject();
                         try {
-                            JSONObject BigData = graphResponse.getJSONObject().getJSONObject("media");
-                            JSONArray JSONpostIDArray = BigData.getJSONArray("data");
+                            assert response != null;
+                            JSONObject MediaData = response.getJSONObject("media");
+                            JSONArray JSONpostIDArray = MediaData.getJSONArray("data");
                             for(int i = 0; i < JSONpostIDArray.length(); i++ ){
-                                JSONObject tmpPostId = JSONpostIDArray.getJSONObject(i);
-                                DataSingelton.ig_postIDs.add(tmpPostId.get("id").toString());
+                                String tmpPostId = JSONpostIDArray.getJSONObject(i).getString("id");
+                                DataSingelton.getIg_postIDs().add(tmpPostId);
                             }
                             //get the next page :
-                            GetPostIDs_nextpage(BigData,ID);
+                            getPostIDs_nextpage(response,ID);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -242,7 +250,7 @@ public class FetchData extends IntentService {
 
         graphRequest.executeAsync();                                                                //on a seprate thread in the background
     }
-    private void GetPostIDs_nextpage(@NonNull JSONObject response, String ID){
+    private void getPostIDs_nextpage(@NonNull JSONObject response, String ID){
         try {
             GraphRequest graphRequest = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(),
                     ID+"/media",
@@ -250,13 +258,14 @@ public class FetchData extends IntentService {
                         @Override
                         public void onCompleted(@NonNull GraphResponse graphResponse) {
                             try {
-                                JSONObject BigData = graphResponse.getJSONObject();
-                                JSONArray JSONpostIDArray = BigData.getJSONArray("data");
+                                JSONObject response = graphResponse.getJSONObject();
+                                assert response != null;
+                                JSONArray JSONpostIDArray = response.getJSONArray("data");
                                 for(int i = 0; i < JSONpostIDArray.length(); i++ ){
                                     JSONObject tmpPostId = JSONpostIDArray.getJSONObject(i);
-                                    DataSingelton.ig_postIDs.add(tmpPostId.get("id").toString());
+                                    DataSingelton.getIg_postIDs().add(tmpPostId.get("id").toString());
                                 }
-                                GetPostIDs_nextpage(BigData,ID);
+                                getPostIDs_nextpage(response,ID);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -268,27 +277,25 @@ public class FetchData extends IntentService {
             bundle.putString("limit","25");
             bundle.putString("after",response.getJSONObject("paging").getJSONObject("cursors").getString("after"));
             graphRequest.setParameters(bundle);
-            graphRequest.executeAsync();                                                                //on a seprate thread in the background
+            graphRequest.executeAsync();
             //pretty=0&limit=100&after=QVFIUmVUdE1xM3N2MDhGcXNhaXgzaUdNcE5WUlZACblFyNklSbzBWcEJraU5oSjZAtR0EwWmZAoZAzl6aW5acDVlSGNWbzhHZA1dGU0dMeHA1MXg2bm44ZAkE2RWNn
-        } catch (JSONException e) {
-            //finished data init
-            Log.d(TAG, "Post List : "+ DataSingelton.ig_postIDs);
-            GetPostInfo();
-            return;
+        } catch (JSONException e) {//finished data init
+            getPostInfo();                                                                          //post data
+
         }
 
     }
-
-    private void GetPostInfo(){                                                                     //gha fields
-        for (String ID: DataSingelton.ig_postIDs) {                                                 //sends requests for each post
+    private void getPostInfo(){                                                                     //gha fields
+        for (String ID: DataSingelton.getIg_postIDs()) {                                                 //sends requests for each post
             GraphRequest graphRequest = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(),
                     ID, new GraphRequest.Callback() {
                         @Override
                         public void onCompleted(@NonNull GraphResponse graphResponse) {
                             JSONObject response = graphResponse.getJSONObject();
+                            assert response != null;
                             PostData postData = new PostData(response);
-                            DataSingelton.ig_post_data.put(ID,postData);                            //post data
-                            GetPostAnalytics(ID);                                                   //post insights
+                            DataSingelton.getIg_post_data().put(ID,postData);
+                            GetPostAnalytics(ID);                                                                   //post insights
                         }
                     });
             Bundle bundle = new Bundle();
@@ -299,15 +306,15 @@ public class FetchData extends IntentService {
 
     }
     private void GetPostAnalytics(@NonNull String ID){                                              //For analytics
-        String MediaType = DataSingelton.ig_post_data.get(ID).getMedia_type();                      //the insights use the same Data class format
+        String MediaType = Objects.requireNonNull(DataSingelton.getIg_post_data().get(ID)).getMedia_type();                 //the insights use the same Data class format
         GraphRequest graphRequest = GraphRequest.newGraphPathRequest(AccessToken.getCurrentAccessToken(),
                 ID+"/insights", new GraphRequest.Callback() {
                     @Override
                     public void onCompleted(@NonNull GraphResponse graphResponse) {
-                        JSONObject BigData = graphResponse.getJSONObject();
-                        if (BigData == null) return;
+                        JSONObject response = graphResponse.getJSONObject();
+                        if (response == null) return;
                         try {
-                            CreateDataPosts(BigData.getJSONArray("data"), ID);
+                            createDataPosts(response.getJSONArray("data"), ID);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -327,20 +334,19 @@ public class FetchData extends IntentService {
         graphRequest.executeAsync();
 
     }
-
-    private void CreateNameUsernameProfilePictureData(@NonNull JSONObject json) {
+    
+    private void createProfileData(@NonNull JSONObject json) {
         try {
-            DataSingelton.ig_profilePictureURL = json.get("profile_picture_url").toString();
-            DataSingelton.ig_name = json.get("name").toString();
-            DataSingelton.ig_username = json.get("username").toString();
-            //fetch the image and show it :
-            new FetchImage(DataSingelton.ig_profilePictureURL).start();
-            //chouf thread : it worked :D
+            DataSingelton.setIg_profilePictureURL(json.getString("profile_picture_url"));
+            DataSingelton.setIg_name(json.getString("name"));
+            DataSingelton.setIg_username(json.getString("username"));
+            DataSingelton.setFollowers_count(json.getInt("followers_count"));
+            new FetchImage(DataSingelton.getIg_profilePictureURL()).start();
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-    class FetchImage extends Thread{
+    static class FetchImage extends Thread{
         String url;
         public FetchImage(String url){
             this.url = url;
@@ -349,14 +355,13 @@ public class FetchData extends IntentService {
         public void run() {
             try {
                 InputStream inputStream = new java.net.URL(url).openStream();
-                DataSingelton.ig_BITMAPprofilePictureURL = BitmapFactory.decodeStream(inputStream);
-                DataSingelton.finishedProfileDataInit = true;
+                DataSingelton.setIg_BITMAPprofilePictureURL(BitmapFactory.decodeStream(inputStream));
+                DataSingelton.setFinishedProfileDataInit(true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
-
     private void CreateData(@NonNull JSONArray retrievedData) {
         //data is distributed in the HASHMAP
         try {
@@ -366,9 +371,9 @@ public class FetchData extends IntentService {
                 String temp_JSONData_name = temp_JSONData.getString("name");
                 //put data in the Map in the singelton
                 Data temp_data = new Data(temp_JSONData);
-                DataSingelton.data.put(temp_JSONData_name,temp_data);
+                DataSingelton.getData().put(temp_JSONData_name,temp_data);
             }
-            DataSingelton.finishedDataInit = true;
+            DataSingelton.setFinishedDataInit(true);
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -377,6 +382,7 @@ public class FetchData extends IntentService {
     //TODO RECHECK HADCHI
     private void CreateLifetimeData_OnlineFollowers(@NonNull JSONArray retrievedData){
         try {
+            if (retrievedData.length() == 0) DataSingelton.setLifetimeData_audienceCountry(null);
             for(int i = 0; i < retrievedData.length(); i++){
                 //conversions and tmp shit
                 JSONObject temp_JSONData = new JSONObject(retrievedData.get(i).toString());
@@ -384,11 +390,9 @@ public class FetchData extends IntentService {
 
                 //put data in the Map in the singelton
                 Data temp_data = new Data(temp_JSONData);
-                DataSingelton.lifetimeData_onlineFollowers.put(temp_JSONData_name,temp_data);
+                DataSingelton.getLifetimeData_onlineFollowers().put(temp_JSONData_name,temp_data);
             }
-            //End of initialisation : stopping the service
-            DataSingelton.finishedLifetimeDataInit_onlinefollowers = true;
-            //FetchData.stopService();
+            DataSingelton.setFinishedLifetimeDataInit_onlinefollowers(true);
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -396,7 +400,7 @@ public class FetchData extends IntentService {
     }
     private void CreateLifetimeData_AudienceCountry(@NonNull JSONArray retrievedData){
         try {
-            if (retrievedData.length() == 0) DataSingelton.lifetimeData_audienceCountry = null;
+            if (retrievedData.length() == 0) DataSingelton.setLifetimeData_audienceCountry(null);
             for(int i = 0; i < retrievedData.length(); i++){
                 //conversions and tmp shit
                 JSONObject temp_JSONData = new JSONObject(retrievedData.get(i).toString());
@@ -404,17 +408,16 @@ public class FetchData extends IntentService {
 
                 //put data in the Map in the singelton
                 Data temp_data = new Data(temp_JSONData);
-                DataSingelton.lifetimeData_audienceCountry.put(temp_JSONData_name,temp_data);
+                DataSingelton.getLifetimeData_audienceCountry().put(temp_JSONData_name,temp_data);
             }
-            DataSingelton.finishedLifetimeDataInit_audiencecountry = true;
+            DataSingelton.setFinishedLifetimeDataInit_audiencecountry(true);
             //FetchData.stopService();
         }
         catch (JSONException e) {
             e.printStackTrace();
         }
     }
-
-    private void CreateDataPosts(@NonNull JSONArray retrievedData,String ID) {
+    private void createDataPosts(@NonNull JSONArray retrievedData,String ID) {
         try {
             Map<String,Data> tmp_postData = new LinkedHashMap<>();
             for(int i = 0; i < retrievedData.length(); i++){
@@ -425,9 +428,9 @@ public class FetchData extends IntentService {
                 Data temp_data = new Data(temp_JSONData);
                 tmp_postData.put(temp_JSONData_name,temp_data);
             }
-            DataSingelton.ig_post_data_insights.put(ID,tmp_postData);
-            if (DataSingelton.ig_post_data_insights.size() == DataSingelton.ig_postIDs.size()) {
-                DataSingelton.finishedDataPostsInit = true;
+            DataSingelton.getIg_post_data_insights().put(ID,tmp_postData);
+            if (DataSingelton.getIg_post_data_insights().size() == DataSingelton.getIg_postIDs().size()) {
+                DataSingelton.setFinishedDataPostsInit(true);
             }
         }
         catch (JSONException e) {

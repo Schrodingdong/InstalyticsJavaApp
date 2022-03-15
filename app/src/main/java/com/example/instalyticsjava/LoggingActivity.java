@@ -1,5 +1,6 @@
 package com.example.instalyticsjava;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -15,6 +16,8 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+
+import java.util.Objects;
 
 
 //to import YOUR ids !!!!!!!!!!!!!!!
@@ -34,7 +37,7 @@ public class LoggingActivity extends AppCompatActivity {
 
     private CallbackManager callbackManager;
     private LoginButton loginButton;
-    private String InstagramBusinessAccountID = null;
+    private final String InstagramBusinessAccountID = null;
 
 
     //what happens when we open the app THE FIRST TIME !!!!
@@ -42,12 +45,12 @@ public class LoggingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_logging);
 
 
         callbackManager = CallbackManager.Factory.create();
-        loginButton = (LoginButton) findViewById(R.id.login_button);
+        loginButton = findViewById(R.id.login_button);
         loginButton.setPermissions("pages_show_list,instagram_basic,instagram_manage_insights,instagram_manage_comments,pages_read_engagement");
 
         // Callback registration
@@ -61,19 +64,17 @@ public class LoggingActivity extends AppCompatActivity {
                 Log.d("LoggingActivity","log Canceled");
             }
             @Override
-            public void onError(FacebookException exception) {
+            public void onError(@NonNull FacebookException exception) {
                 Log.d("LoggingActivity",exception.getMessage());
             }
         });
-    };
+    }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-
         Log.d("LoggingActivity", "goto CORE");
         if (AccessToken.getCurrentAccessToken() != null){
             //Go to main core

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.instalyticsjava" >
+    package="com.example.instalyticsjava">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -10,7 +10,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.InstalyticsJava" >
+        android:theme="@style/Theme.InstalyticsJava">
+        <activity
+            android:name=".InterpretationActivity"
+            android:exported="false"/>
         <activity
             android:name=".HashtagList"
             android:exported="false" />
@@ -29,7 +32,7 @@
             android:name=".SplashScreen"
             android:exported="true"
             android:launchMode="singleTask"
-            android:noHistory="true" >
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

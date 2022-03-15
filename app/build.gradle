@@ -43,6 +43,7 @@ dependencies {
 //    implementation files('libs\\commons-math3-3.6.1-test-sources.jar')
 //    implementation files('libs\\commons-math3-3.6.1-tests.jar')
 //    implementation files('libs\\commons-math3-3.6.1-tools.jar')
+    implementation group: 'org.ejml', name: 'ejml-all', version: '0.41'
 
 
     testImplementation 'junit:junit:4.13.2'

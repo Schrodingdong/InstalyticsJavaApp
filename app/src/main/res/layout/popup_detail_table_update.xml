@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Please Enter the new Value"
+            android:textColor="@color/Text"
+            android:layout_margin="@dimen/margin"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
+
+        <EditText
+            android:id="@+id/new_value_detail_table"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="new order Value"
+            android:textSize="@dimen/textSize_regular"
+            android:inputType="number"
+            android:textColor="@color/Text"
+            android:textColorHint="@color/insta_orangeBrightBright"
+
+            android:layout_marginVertical="@dimen/margin"
+            app:layout_constraintStart_toStartOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@+id/title" />
+
+
+        <Button
+            android:id="@+id/UPDATEbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:backgroundTint="@color/white"
+            android:text="Ok"
+            android:textSize="@dimen/textSize_regular"
+            android:textColor="@color/Text"
+            android:layout_marginVertical="@dimen/margin"
+
+            app:layout_constraintEnd_toEndOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@id/new_value_detail_table"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

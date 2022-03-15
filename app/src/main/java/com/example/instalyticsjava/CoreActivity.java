@@ -1,21 +1,12 @@
 package com.example.instalyticsjava;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import android.animation.RectEvaluator;
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
-import android.media.Image;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.ResultReceiver;
-import android.se.omapi.Session;
-import android.support.v4.os.IResultReceiver;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -24,32 +15,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.instalyticsjava.data.Data;
-import com.example.instalyticsjava.data.Value;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
+import com.example.instalyticsjava.Util.UtilFunctions;
 import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.time.Clock;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 public class CoreActivity extends AppCompatActivity {
     private final String TAG ="CoreActivity";
@@ -66,7 +40,6 @@ public class CoreActivity extends AppCompatActivity {
     private TextView avgProfileViews;
     private TextView reachPercentage;
     private TextView avg_follower_gain_value;
-    private TextView ConsistencyReach;
     //post brief
     private Button PostBriefNameButton;
     private com.github.mikephil.charting.charts.BarChart posts_brief_graph;
@@ -79,56 +52,63 @@ public class CoreActivity extends AppCompatActivity {
     private TextView avg_reach_value;
     private TextView avg_impressions_value;
     private TextView reach_percentage_post_value;
+    //interpretation
+    private Button interpretation_Name_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_core);
 
 
         //profile name username picture
-        accountUsername = (TextView) findViewById(R.id.AccountUsername);
-        accountName = (TextView) findViewById(R.id.AccountName);
-        accountProfilePicture = (ImageView) findViewById(R.id.AccountPictureInner);
+        accountUsername = findViewById(R.id.AccountUsername);
+        accountName = findViewById(R.id.AccountName);
+        accountProfilePicture = findViewById(R.id.AccountPictureInner);
 
 
         //profile brief
-        ProfileBriefNameButton = (Button) findViewById(R.id.ProfileBrief_Name_button);
+        ProfileBriefNameButton = findViewById(R.id.ProfileBrief_Name_button);
         ProfileBriefNameButton.setOnClickListener(view -> {
             Intent intent = new Intent(CoreActivity.this, ProfileAnalytics.class);
             startActivity(intent);
         });
-        profile_brief_barChart = (com.github.mikephil.charting.charts.BarChart) findViewById(R.id.profile_brief_graph);
+        profile_brief_barChart = findViewById(R.id.profile_brief_graph);
         profile_brief_barChart.setNoDataText("No Data Available :(");
-        avgProfileViews = (TextView) findViewById(R.id.avg_followersViews_value);
-        reachPercentage = (TextView) findViewById(R.id.reach_percentage_value);
-        avg_follower_gain_value = (TextView) findViewById(R.id.avg_follower_gain_value);
+        avgProfileViews = findViewById(R.id.avg_followersViews_value);
+        reachPercentage = findViewById(R.id.reach_percentage_value);
+        avg_follower_gain_value = findViewById(R.id.avg_follower_gain_value);
 
 
         //postBriefs :
-        PostBriefNameButton = (Button) findViewById(R.id.posts_brief_Name_button);
+        PostBriefNameButton = findViewById(R.id.posts_brief_Name_button);
         PostBriefNameButton.setOnClickListener(view -> {
             Intent intent = new Intent(CoreActivity.this, PostAnalytics.class);
             startActivity(intent);
         });
-        posts_brief_graph = (com.github.mikephil.charting.charts.BarChart) findViewById(R.id.posts_brief_graph);
+        posts_brief_graph = findViewById(R.id.posts_brief_graph);
         posts_brief_graph.setNoDataText("No Data Available :(");
-        goto_post1 = (Button) findViewById(R.id.goto_post1);
-        goto_post2 = (Button) findViewById(R.id.goto_post2);
-        goto_post3 = (Button) findViewById(R.id.goto_post3);
-        goto_post4 = (Button) findViewById(R.id.goto_post4);
-        goto_post5 = (Button) findViewById(R.id.goto_post5);
-        avg_engagement_value = (TextView) findViewById(R.id.avg_engagement_value);
-        avg_reach_value = (TextView) findViewById(R.id.avg_reach_value);
-        avg_impressions_value = (TextView) findViewById(R.id.avg_impressions_value);
-        reach_percentage_post_value = (TextView) findViewById(R.id.reach_percentage_post_value);
-
+        goto_post1 = findViewById(R.id.goto_post1);
+        goto_post2 = findViewById(R.id.goto_post2);
+        goto_post3 = findViewById(R.id.goto_post3);
+        goto_post4 = findViewById(R.id.goto_post4);
+        goto_post5 = findViewById(R.id.goto_post5);
+        avg_engagement_value = findViewById(R.id.avg_engagement_value);
+        avg_reach_value = findViewById(R.id.avg_reach_value);
+        avg_impressions_value = findViewById(R.id.avg_impressions_value);
+        reach_percentage_post_value = findViewById(R.id.reach_percentage_post_value);
 
         //interpretation:
-        ConsistencyReach = (TextView) findViewById(R.id.consistency_reach_value);
-
+        interpretation_Name_button = findViewById(R.id.interpretation_Name_button);
+        interpretation_Name_button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(CoreActivity.this, InterpretationActivity.class);
+                startActivity(intent);
+            }
+        });
 
         //log out
         logOutButton = findViewById(R.id.logout_button_core);
@@ -137,11 +117,11 @@ public class CoreActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (!(DataSingelton.finishedDataInit &&
-                DataSingelton.finishedProfileDataInit &&
-                DataSingelton.finishedDataPostsInit &&
-                DataSingelton.finishedLifetimeDataInit_audiencecountry &&
-                DataSingelton.finishedLifetimeDataInit_onlinefollowers)){
+        if (!(  DataSingelton.isFinishedDataInit() &&
+                DataSingelton.isFinishedProfileDataInit() &&
+                DataSingelton.isFinishedDataPostsInit() &&
+                DataSingelton.isFinishedLifetimeDataInit_audiencecountry() &&
+                DataSingelton.isFinishedLifetimeDataInit_onlinefollowers())){
             Intent intent = new Intent(this, FetchData.class);
             new waitForData(intent).start();
         }
@@ -152,7 +132,7 @@ public class CoreActivity extends AppCompatActivity {
         Intent intent = new Intent(CoreActivity.this, LoggingActivity.class);
         startActivity(intent);
         DataSingelton.ResetData();
-        Log.d(TAG, "onClick: data after reset : "+DataSingelton.data);
+        Log.d(TAG, "onClick: data after reset : "+DataSingelton.getData());
         finish();
     }
 
@@ -166,8 +146,8 @@ public class CoreActivity extends AppCompatActivity {
 
         public waitForData(Intent fetchIntent){
             this.fetchIntent = fetchIntent;
-            spinner = (ProgressBar)findViewById(R.id.progressBar1);
-            MainContent = (ConstraintLayout)findViewById(R.id.scrollable_area);
+            spinner = findViewById(R.id.progressBar1);
+            MainContent = findViewById(R.id.scrollable_area);
             spinner.setVisibility(View.VISIBLE);
             MainContent.setVisibility(View.GONE);
         }
@@ -176,11 +156,11 @@ public class CoreActivity extends AppCompatActivity {
         public void run() {
             startService(fetchIntent);
             Log.d(TAG, "onStart: started service");
-            while(!((DataSingelton.finishedDataInit &&
-                    DataSingelton.finishedProfileDataInit &&
-                    DataSingelton.finishedDataPostsInit &&
-                    DataSingelton.finishedLifetimeDataInit_audiencecountry &&
-                    DataSingelton.finishedLifetimeDataInit_onlinefollowers) ||
+            while(!((DataSingelton.isFinishedDataInit() &&
+                    DataSingelton.isFinishedProfileDataInit() &&
+                    DataSingelton.isFinishedDataPostsInit() &&
+                    DataSingelton.isFinishedLifetimeDataInit_audiencecountry() &&
+                    DataSingelton.isFinishedLifetimeDataInit_onlinefollowers()) ||
                     ++timer == time_limit)) {
                     try {
                         Thread.sleep(1);
@@ -191,14 +171,12 @@ public class CoreActivity extends AppCompatActivity {
             else{
                 FetchData.stopService();
                 runOnUiThread(new Runnable() {
+                    @SuppressLint("DefaultLocale")
                     @Override
                     public void run() {
                         SetProfileNameUsernamePicture();
                         SetProfileBriefData();
                         SetLast5Posts();
-                        //Set data in Interpretation :
-                        ConsistencyReach.setText(String.format("%.1f %%",UtilFunctions.getConsistencyOf(DataSingelton.data.get("profile_views"))*100));
-
                         spinner.setVisibility(View.GONE);
                         MainContent.setVisibility(View.VISIBLE);
                     }
@@ -210,16 +188,17 @@ public class CoreActivity extends AppCompatActivity {
     private float barSpace = 0f;
     private float groupSpace = 0.4f;
     private void SetProfileNameUsernamePicture() {
-        accountUsername.setText(DataSingelton.ig_username);
-        accountName.setText(DataSingelton.ig_name);
-        accountProfilePicture.setImageBitmap(DataSingelton.ig_BITMAPprofilePictureURL);
+        accountUsername.setText(DataSingelton.getIg_username());
+        accountName.setText(DataSingelton.getIg_name());
+        accountProfilePicture.setImageBitmap(DataSingelton.getIg_BITMAPprofilePictureURL());
     }
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void SetProfileBriefData() {
         //for profile Brief :
-        profile_brief_barChart.setData(UtilFunctions.getProfileDataChartEntry(DataSingelton.data));
+        profile_brief_barChart.setData(UtilFunctions.getProfileDataChartEntry(DataSingelton.getData()));
         //for the X axis : ndiroha 3la 7ssab nhar :
         profile_brief_barChart.getAxisRight().setEnabled(false);
-        List<String> timeFetched = UtilFunctions.GetEndTimeList(DataSingelton.data);
+        List<String> timeFetched = UtilFunctions.GetEndTimeList(DataSingelton.getData());
         //Log.d(TAG, "run: size timefetched : "+timeFetched.size());
         XAxis profile_Xaxis = profile_brief_barChart.getXAxis();
         profile_Xaxis.setValueFormatter(new IndexAxisValueFormatter(timeFetched));
@@ -242,11 +221,15 @@ public class CoreActivity extends AppCompatActivity {
         profile_brief_barChart.animateY(1300, Easing.EaseOutQuart);
         profile_brief_barChart.invalidate();
         //set the text :
-        avgProfileViews.setText(String.format("%.1f",UtilFunctions.getAVGof(DataSingelton.data.get("profile_views"))));
-        reachPercentage.setText(String.format("%.1f",UtilFunctions.getReachPercentage(DataSingelton.data)*100) + "%");
-        avg_follower_gain_value.setText(String.format("%.1f%%",UtilFunctions.getAVGof(DataSingelton.data.get("follower_gain"))));
+        avgProfileViews.setText(String.format("%.1f",
+                UtilFunctions.getAVGof(DataSingelton.getData().get("profile_views"))));
+        reachPercentage.setText(String.format("%.1f",
+                UtilFunctions.getReachPercentage(DataSingelton.getData())*100) + "%");
+        avg_follower_gain_value.setText(String.format("%.1f%%",
+                UtilFunctions.getAVGof(DataSingelton.getData().get("follower_gain"))));
 
     }
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void SetLast5Posts() {
         //for profile Brief :
         posts_brief_graph.setData(UtilFunctions.getTop5PostsDataChartEntry());
@@ -326,10 +309,14 @@ public class CoreActivity extends AppCompatActivity {
         });
 
         //set text :
-        avg_engagement_value.setText(String.format("%.1f",UtilFunctions.getPostAVGof("engagement")));
-        avg_reach_value.setText(String.format("%.1f",UtilFunctions.getPostAVGof("reach")));
-        avg_impressions_value.setText(String.format("%.1f",UtilFunctions.getPostAVGof("impressions")));
-        reach_percentage_post_value.setText(String.format("%.1f",UtilFunctions.getPostReachPercentage()*100) + "%");
+        avg_engagement_value.setText(String.format("%.1f",
+                UtilFunctions.getPostAVGof("engagement")));
+        avg_reach_value.setText(String.format("%.1f",
+                UtilFunctions.getPostAVGof("reach")));
+        avg_impressions_value.setText(String.format("%.1f",
+                UtilFunctions.getPostAVGof("impressions")));
+        reach_percentage_post_value.setText(String.format("%.1f",
+                UtilFunctions.getPostReachPercentage()*100) + "%");
     }
 
 }

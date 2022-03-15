@@ -1,7 +1,5 @@
 package com.example.instalyticsjava;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,31 +8,28 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 
-import com.example.instalyticsjava.dataposts.PostData;
 import com.example.instalyticsjava.recyclerViewThings.MyAdapter;
-import com.github.mikephil.charting.data.LineRadarDataSet;
 
-import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class HashtagList extends AppCompatActivity {
     private final String TAG = "HashtagList";
-    private Map<String,Integer> HashtagElementMap = new HashMap<String,Integer>();                  //the # && engagement
-    private Set<String> HashtagsSet = new HashSet<>();
+    private final Map<String,Integer> HashtagElementMap = new HashMap<String,Integer>();                  //the # && engagement
+    private final Set<String> HashtagsSet = new HashSet<>();
     private List<String> Hashtags = new ArrayList<>();
     private RecyclerView hashtag_recycler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_hashtag_list);
 
 
@@ -50,7 +45,7 @@ public class HashtagList extends AppCompatActivity {
     private void InitialiseHashtagMap(){
         Set<String> HSet = new HashSet<String>();
         for (String id :
-                DataSingelton.ig_postIDs) {
+                DataSingelton.getIg_postIDs()) {
             getPostHashtagInMap(id);
         }
         getHashtagList();
@@ -60,17 +55,17 @@ public class HashtagList extends AppCompatActivity {
         orderHashtagList();
     }
     private void getPostHashtagInMap(String id){
-        String caption = DataSingelton.ig_post_data.get(id).getCaption();
+        String caption = Objects.requireNonNull(DataSingelton.getIg_post_data().get(id)).getCaption();
         String[] Harray = caption.split("#",100);                                         //the 0 is always useless
         int l = Harray.length;
         for (int i = 1; i < l ; i++){
             HashtagsSet.add(Harray[i]);
             if(HashtagElementMap.get(Harray[i]) == null)
                 HashtagElementMap.put(Harray[i],
-                        DataSingelton.ig_post_data_insights.get(id).get("engagement").getValues().get(0).getValue());
+                        Objects.requireNonNull(Objects.requireNonNull(DataSingelton.getIg_post_data_insights().get(id)).get("engagement")).getValues().get(0).getValue());
             else{
                 int engagement = HashtagElementMap.get(Harray[i]);
-                engagement += DataSingelton.ig_post_data_insights.get(id).get("engagement").getValues().get(0).getValue();
+                engagement += Objects.requireNonNull(Objects.requireNonNull(DataSingelton.getIg_post_data_insights().get(id)).get("engagement")).getValues().get(0).getValue();
                 HashtagElementMap.put(Harray[i],engagement);
             }
         }

@@ -17,4 +17,7 @@
     <style name="ShapeAppearanceOverlay.ProfilePicture" parent="">
         <item name="cornerSize">50%</item>
     </style>
+    <style name="Theme.PopupMenu" parent="">
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+    </style>
 </resources>

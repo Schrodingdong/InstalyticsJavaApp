@@ -1,11 +1,14 @@
-package com.example.instalyticsjava;
+package com.example.instalyticsjava.Util;
 
 import android.graphics.Color;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import com.example.instalyticsjava.DataSingelton;
 import com.example.instalyticsjava.data.Data;
 import com.example.instalyticsjava.data.Value;
 import com.example.instalyticsjava.dataposts.PostData;
@@ -24,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class UtilFunctions extends AppCompatActivity {
     private final static String TAG = "UtilFunctions";
@@ -66,10 +70,6 @@ public class UtilFunctions extends AppCompatActivity {
                         index++;
                     }
                     Collections.reverse(entryArrayList_reach);
-//                    BarDataSet barDataSet = new BarDataSet(entryArrayList_reach, "Reach");
-//                    barDataSet.setColor(Color.rgb(224, 179, 255));
-//                    barData.addDataSet(barDataSet);                     //insertion in the barData to return
-
                     break;
                 }
                 case "profile_views": {
@@ -79,10 +79,6 @@ public class UtilFunctions extends AppCompatActivity {
                         index++;
                     }
                     Collections.reverse(entryArrayList_profileViews);
-//                    BarDataSet barDataSet = new BarDataSet(entryArrayList_profileViews, "Profile Views");
-//                    barDataSet.setColor(Color.rgb(255, 179, 215));
-//                    barData.addDataSet(barDataSet);                     //insertion in the barData to return
-
                     break;
                 }
                 case "impressions" : {
@@ -92,10 +88,6 @@ public class UtilFunctions extends AppCompatActivity {
                         index++;
                     }
                     Collections.reverse(entryArrayList_impressions);
-//                    BarDataSet barDataSet = new BarDataSet(entryArrayList_impressions, "Impressions");
-//                    barDataSet.setColor(Color.rgb(161, 168, 255));
-//                    barData.addDataSet(barDataSet);                     //insertion in the barData to return
-
                     break;
                 }
                 default:
@@ -103,9 +95,6 @@ public class UtilFunctions extends AppCompatActivity {
             }
             barData.setBarWidth(bar_width);
         }
-//        Collections.reverse(entryArrayList_reach);
-//        Collections.reverse(entryArrayList_engagement);
-//        Collections.reverse(entryArrayList_impressions);
         BarDataSet barDataSet_reach = new BarDataSet(entryArrayList_reach,"reach");
         barDataSet_reach.setColor(Color.rgb(224, 179, 255));
 
@@ -124,14 +113,14 @@ public class UtilFunctions extends AppCompatActivity {
     }
     @Nullable
     public static LineData getFollowersDataChartEntry(@NonNull Map<String, Data> profileData){
-        if (profileData == null || profileData.get("follower_count") == null) return null;
+        if (profileData.get("follower_count") == null) return null;
         LineData lineData;
         for (Map.Entry<String, Data> element : profileData.entrySet()) {
             ArrayList<Entry> entryArrayList = new ArrayList<>();
             int index = 0;
             float offset = 0.5f;//bach yji nichan lwst
             if (element.getKey().compareTo("follower_count") == 0){
-                ArrayList<Integer> tmp = new ArrayList<Integer>();
+                ArrayList<Integer> tmp = new ArrayList<>();
                 for (Value v : element.getValue().getValues()) {    //instantiate the entry for the follower_count metric
                     tmp.add(v.getValue());
                 }
@@ -159,12 +148,12 @@ public class UtilFunctions extends AppCompatActivity {
             float max = -1;
             String maxID = "";
             //an sommiw dakchi li glna 9bl
-            for (Map.Entry<String, Map<String,Data>> entry: DataSingelton.ig_post_data_insights.entrySet()) {
+            for (Map.Entry<String, Map<String,Data>> entry: DataSingelton.getIg_post_data_insights().entrySet()) {
                 if (Top5Posts.contains(entry.getKey()))
                     continue;
-                int eng = entry.getValue().get("engagement").getValues().get(0).getValue();
-                int impr = entry.getValue().get("impressions").getValues().get(0).getValue();
-                int reach = entry.getValue().get("reach").getValues().get(0).getValue();
+                int eng = Objects.requireNonNull(entry.getValue().get("engagement")).getValues().get(0).getValue();
+                int impr = Objects.requireNonNull(entry.getValue().get("impressions")).getValues().get(0).getValue();
+                int reach = Objects.requireNonNull(entry.getValue().get("reach")).getValues().get(0).getValue();
                 float postNotoriety = (float) eng+impr+reach / 3f;
                 if (max < postNotoriety){
                     max = postNotoriety;
@@ -179,19 +168,19 @@ public class UtilFunctions extends AppCompatActivity {
     @NonNull
     public static BarData getTop5PostsDataChartEntry(){
         List<String> Top5Posts = getTop5Posts();
-        Map<String, Map<String,Data>> postDataInsights = DataSingelton.ig_post_data_insights;
+        Map<String, Map<String,Data>> postDataInsights = DataSingelton.getIg_post_data_insights();
         BarData barData;
         //create a list of bar entries + create the data sets
         float bar_width = 0.2f;
         ArrayList<BarEntry> entryArrayList_reach = new ArrayList<>();
         ArrayList<BarEntry> entryArrayList_engagement = new ArrayList<>();
         ArrayList<BarEntry> entryArrayList_impressions = new ArrayList<>();
-        int index = 0;
+        int index;
         for (index =0 ; index < 5 ; index++){
             for (Map.Entry<String, Map<String,Data>> element : postDataInsights.entrySet()){
 
                 String currentPostID = element.getKey();
-                if (Top5Posts.get(index) !=  currentPostID) continue;
+                if (!Top5Posts.get(index).equals(currentPostID)) continue;
                 for ( Map.Entry<String,Data> element2 : element.getValue().entrySet()){
 
                     switch (element2.getKey()){
@@ -229,7 +218,7 @@ public class UtilFunctions extends AppCompatActivity {
     }
     @NonNull
     public static BarData getLast10PostsDataChartEntry(@NonNull Map<String, PostData> postData, @NonNull Map<String, Map<String,Data>> postDataInsights){
-        List<String> ig_postIDs = DataSingelton.ig_postIDs;
+        List<String> ig_postIDs = DataSingelton.getIg_postIDs();
         BarData barData;
         //create a list of bar entries + create the data sets
         float bar_width = 0.2f;
@@ -239,7 +228,8 @@ public class UtilFunctions extends AppCompatActivity {
         int counter = 0;
         for (String ID : ig_postIDs){
             if (counter >= 10) break;
-            Map<String,Data> element = DataSingelton.ig_post_data_insights.get(ID);
+            Map<String,Data> element = DataSingelton.getIg_post_data_insights().get(ID);
+            assert element != null;
             for ( Map.Entry<String,Data> element2 : element.entrySet()){
 
                 switch (element2.getKey()){
@@ -287,7 +277,7 @@ public class UtilFunctions extends AppCompatActivity {
         List<String> top5Posts = getTop5Posts();
         for (String postID:
                 top5Posts) {
-            result.add(DataSingelton.ig_post_data.get(postID).getPermalink());
+            result.add(Objects.requireNonNull(DataSingelton.getIg_post_data().get(postID)).getPermalink());
         }
         return result;
     }
@@ -299,22 +289,22 @@ public class UtilFunctions extends AppCompatActivity {
         engagementTracker.put("VIDEO",0);
         engagementTracker.put("CAROUSEL_ALBUM",0);
         for (String id :
-                DataSingelton.ig_postIDs) {
+                DataSingelton.getIg_postIDs()) {
             int eng_value;
-            switch (DataSingelton.ig_post_data.get(id).getMedia_type()){
+            switch (Objects.requireNonNull(DataSingelton.getIg_post_data().get(id)).getMedia_type()){
                 case "IMAGE":
                     eng_value = engagementTracker.get("IMAGE");
-                    eng_value+= DataSingelton.ig_post_data_insights.get(id).get("engagement").getValues().get(0).getValue();
+                    eng_value+= DataSingelton.getIg_post_data_insights().get(id).get("engagement").getValues().get(0).getValue();
                     engagementTracker.put("IMAGE",eng_value);
                     break;
                 case "VIDEO":
                     eng_value = engagementTracker.get("VIDEO");
-                    eng_value+= DataSingelton.ig_post_data_insights.get(id).get("engagement").getValues().get(0).getValue();
+                    eng_value+= DataSingelton.getIg_post_data_insights().get(id).get("engagement").getValues().get(0).getValue();
                     engagementTracker.put("VIDEO",eng_value);
                     break;
                 case "CAROUSEL_ALBUM":
                     eng_value = engagementTracker.get("CAROUSEL_ALBUM");
-                    eng_value+= DataSingelton.ig_post_data_insights.get(id).get("engagement").getValues().get(0).getValue();
+                    eng_value+= DataSingelton.getIg_post_data_insights().get(id).get("engagement").getValues().get(0).getValue();
                     engagementTracker.put("CAROUSEL_ALBUM",eng_value);
                     break;
                 default:
@@ -358,10 +348,10 @@ public class UtilFunctions extends AppCompatActivity {
         if (metric == null) return 0;
         double average = 0;
         for (Map.Entry<String , Map<String,Data>> element:
-             DataSingelton.ig_post_data_insights.entrySet()) {
-            average += element.getValue().get(metric).getValues().get(0).getValue();
+             DataSingelton.getIg_post_data_insights().entrySet()) {
+            average += Objects.requireNonNull(element.getValue().get(metric)).getValues().get(0).getValue();
         }
-        average /= DataSingelton.ig_post_data_insights.size();
+        average /= DataSingelton.getIg_post_data_insights().size();
         return average;
     }
 
@@ -380,10 +370,10 @@ public class UtilFunctions extends AppCompatActivity {
         double average = getPostAVGof(metric);
         double result = 0;
         for (Map.Entry<String , Map<String,Data>> element:
-                DataSingelton.ig_post_data_insights.entrySet()) {
-            result += Math.abs(element.getValue().get(metric).getValues().get(0).getValue() - average);
+                DataSingelton.getIg_post_data_insights().entrySet()) {
+            result += Math.abs(Objects.requireNonNull(element.getValue().get(metric)).getValues().get(0).getValue() - average);
         }
-        result /= DataSingelton.ig_post_data_insights.size();
+        result /= DataSingelton.getIg_post_data_insights().size();
         return result/average;
     }
     public static double getCorrelationOf(Data metric1, Data metric2){
@@ -402,7 +392,7 @@ public class UtilFunctions extends AppCompatActivity {
     }
     @NonNull
     public static List<Integer> getMetricValueList(@NonNull Data metric){
-        List<Integer> returnlist = new ArrayList<Integer>();
+        List<Integer> returnlist = new ArrayList<>();
         List<Value> valueOfMetric = metric.getValues();
         for (Value v : valueOfMetric){
             returnlist.add(v.getValue());
@@ -411,22 +401,24 @@ public class UtilFunctions extends AppCompatActivity {
     }
     @NonNull
     public static List<Integer> getPostMetricValueList(@NonNull String metric){
-        List<Integer> returnlist = new ArrayList<Integer>();
+        List<Integer> returnlist = new ArrayList<>();
         for (Map.Entry<String , Map<String,Data>> element:
-                DataSingelton.ig_post_data_insights.entrySet()) {
-            returnlist.add(element.getValue().get(metric).getValues().get(0).getValue());
+                DataSingelton.getIg_post_data_insights().entrySet()) {
+            returnlist.add(Objects.requireNonNull(element.getValue().get(metric)).getValues().get(0).getValue());
         }
         return returnlist;
     }
 
 
-    private static double unfollowerReachCoefficient = 0.5; //50%
-    public static Data getUnfollowedReach(Data reach, Map<String,Data> online_followers_data){
-        if (reach == null || online_followers_data == null) return null ;
-        Data online_followers = online_followers_data.get("data");
+    //TODO what the fuck
+    private static final double unfollowerReachCoefficient = 0.5; //50%
+    public static Data getUnfollowedReach(Data reach, Map<String,Data> profile_data){
+        if (reach == null || profile_data == null) return null ;
+        Data online_followers = profile_data.get("data");
         Data returnData = new Data();
         returnData.setName("unfollowed_reach");
         List<Value> reachList = reach.getValues();
+        assert online_followers != null;
         List<Value> onlineFollowerList = online_followers.getValues();
         if (reachList.size() == 0 || onlineFollowerList.size() == 0) return null;
         List<Value> returnList = new ArrayList<>();
@@ -442,8 +434,8 @@ public class UtilFunctions extends AppCompatActivity {
     }
 
     public static double getReachPercentage(@NonNull Map<String,Data> data){
-        List<Value> reach = data.get("reach").getValues();
-        List<Value> impressions = data.get("impressions").getValues();
+        List<Value> reach = Objects.requireNonNull(data.get("reach")).getValues();
+        List<Value> impressions = Objects.requireNonNull(data.get("impressions")).getValues();
         int sumReach = 0;
         int sumImpressions = 0;
         for (Value v: impressions){
@@ -459,9 +451,9 @@ public class UtilFunctions extends AppCompatActivity {
         List<Value> reach = new ArrayList<>();
         List<Value> impressions = new ArrayList<>();
         for (Map.Entry<String , Map<String,Data>> element:
-                DataSingelton.ig_post_data_insights.entrySet()) {
-            reach.add(element.getValue().get("reach").getValues().get(0));
-            impressions.add(element.getValue().get("impressions").getValues().get(0));
+                DataSingelton.getIg_post_data_insights().entrySet()) {
+            reach.add(Objects.requireNonNull(element.getValue().get("reach")).getValues().get(0));
+            impressions.add(Objects.requireNonNull(element.getValue().get("impressions")).getValues().get(0));
         }
 
         int sumReach = 0;
@@ -493,8 +485,8 @@ public class UtilFunctions extends AppCompatActivity {
     public static double EsquaredPost(@NonNull String metric){
         List<Integer> X = new ArrayList<>();
         for (Map.Entry<String , Map<String,Data>> element:
-                DataSingelton.ig_post_data_insights.entrySet()) {
-            X.add(element.getValue().get(metric).getValues().get(0).getValue());
+                DataSingelton.getIg_post_data_insights().entrySet()) {
+            X.add(Objects.requireNonNull(element.getValue().get(metric)).getValues().get(0).getValue());
         }
         double e = 0;
         for (int x:X) e+=x*x;
@@ -514,8 +506,8 @@ public class UtilFunctions extends AppCompatActivity {
     public static double EPost(@NonNull String metric){
         List<Integer> X = new ArrayList<>();
         for (Map.Entry<String , Map<String,Data>> element:
-                DataSingelton.ig_post_data_insights.entrySet()) {
-            X.add(element.getValue().get(metric).getValues().get(0).getValue());
+                DataSingelton.getIg_post_data_insights().entrySet()) {
+            X.add(Objects.requireNonNull(element.getValue().get(metric)).getValues().get(0).getValue());
         }
         double e = 0;
         for (int x:X) e+=x;
@@ -524,21 +516,17 @@ public class UtilFunctions extends AppCompatActivity {
     }
     public static double getVarience(@NonNull Data metric){
         double expected = E(metric);
-        double Varience= Esquared(metric) - expected*expected;
-        return Varience;
+        return Esquared(metric) - expected*expected;
     }
     public static double getPostVarience(@NonNull String metric){
         double expected = EPost(metric);
-        double Varience= EsquaredPost(metric) - expected*expected;
-        return Varience;
+        return EsquaredPost(metric) - expected*expected;
     }
     public static double getStddeviation(@NonNull Data metric){
-        double stdDeviation = Math.sqrt(getVarience(metric));
-        return stdDeviation;
+        return Math.sqrt(getVarience(metric));
     }
     public static double getPostStddeviation(@NonNull String metric){
-        double stdDeviation = Math.sqrt(getPostVarience(metric));
-        return stdDeviation;
+        return Math.sqrt(getPostVarience(metric));
     }
     public static double getCovarience(Data metric1, Data metric2){
         double expected1 = E(metric1);
@@ -563,13 +551,13 @@ public class UtilFunctions extends AppCompatActivity {
         double EMetric1Metric2 = 0;
         List<Integer> X1 = new ArrayList<>();
         for (Map.Entry<String , Map<String,Data>> element:
-                DataSingelton.ig_post_data_insights.entrySet()) {
-            X1.add(element.getValue().get(metric1).getValues().get(0).getValue());
+                DataSingelton.getIg_post_data_insights().entrySet()) {
+            X1.add(Objects.requireNonNull(element.getValue().get(metric1)).getValues().get(0).getValue());
         }
         List<Integer> X2 = new ArrayList<>();
         for (Map.Entry<String , Map<String,Data>> element:
-                DataSingelton.ig_post_data_insights.entrySet()) {
-            X2.add(element.getValue().get(metric2).getValues().get(0).getValue());
+                DataSingelton.getIg_post_data_insights().entrySet()) {
+            X2.add(Objects.requireNonNull(element.getValue().get(metric2)).getValues().get(0).getValue());
         }
         for (int i = 0; i < X1.size() ; i++) EMetric1Metric2+= X1.get(i) * X2.get(i);
         EMetric1Metric2 /= X1.size();
@@ -588,8 +576,7 @@ public class UtilFunctions extends AppCompatActivity {
         final PolynomialCurveFitter fitter = PolynomialCurveFitter.create(orderK);
 
         // Retrieve fitted parameters (coefficients of the polynomial function).
-        final double[] coeff = fitter.fit(obs.toList());
-        return coeff;
+        return fitter.fit(obs.toList());
     }
     //this technique requires an already existing coefficients
     public static float BIC(@NonNull List<Integer> dataForRegression, double[] coefficients, int orderK ){

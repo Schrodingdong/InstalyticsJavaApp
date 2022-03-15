@@ -1,33 +1,29 @@
 package com.example.instalyticsjava;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.widget.TextView;
 
-import com.example.instalyticsjava.data.Data;
-import com.example.instalyticsjava.data.Value;
+
+import com.example.instalyticsjava.Util.UtilFunctions;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 public class ProfileAnalytics extends AppCompatActivity {
 
@@ -59,33 +55,33 @@ public class ProfileAnalytics extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_profile_analytics);
 
         //textViews :
-        avg_profile_views_value = (TextView) findViewById(R.id.avg_profile_views_value);
-        avg_reach_value = (TextView) findViewById(R.id.avg_reach_value);
-        avg_impressions_value = (TextView) findViewById(R.id.avg_impressions_value);
-        reach_percentage_value = (TextView) findViewById(R.id.reach_percentage_value);
-        returning_users_value = (TextView) findViewById(R.id.returning_users_value);
+        avg_profile_views_value = findViewById(R.id.avg_profile_views_value);
+        avg_reach_value = findViewById(R.id.avg_reach_value);
+        avg_impressions_value = findViewById(R.id.avg_impressions_value);
+        reach_percentage_value = findViewById(R.id.reach_percentage_value);
+        returning_users_value = findViewById(R.id.returning_users_value);
 
-        deviation_profile_views_value = (TextView) findViewById(R.id.deviation_profile_views_value);
-        deviation_impressions_value = (TextView) findViewById(R.id.deviation_impressions_value);
-        deviation_reach_value = (TextView) findViewById(R.id.deviation_reach_value);
+        deviation_profile_views_value = findViewById(R.id.deviation_profile_views_value);
+        deviation_impressions_value = findViewById(R.id.deviation_impressions_value);
+        deviation_reach_value = findViewById(R.id.deviation_reach_value);
 
-        avg_follower_gain_value = (TextView) findViewById(R.id.avg_follower_gain_value);
-        deviation_follower_gain_value = (TextView) findViewById(R.id.deviation_follower_gain_value);
+        avg_follower_gain_value = findViewById(R.id.avg_follower_gain_value);
+        deviation_follower_gain_value = findViewById(R.id.deviation_follower_gain_value);
 
-        corr_profileViews_impressions_value = (TextView) findViewById(R.id.corr_profileViews_impressions_value);
-        corr_newReach_followerGain_value = (TextView) findViewById(R.id.corr_newReach_followerGain_value);
-        corr_profileViews_followerGain_value = (TextView) findViewById(R.id.corr_profileViews_followerGain_value);
+        corr_profileViews_impressions_value = findViewById(R.id.corr_profileViews_impressions_value);
+        corr_newReach_followerGain_value = findViewById(R.id.corr_newReach_followerGain_value);
+        corr_profileViews_followerGain_value = findViewById(R.id.corr_profileViews_followerGain_value);
 
         //charts
-        profile_analytics_graph= (com.github.mikephil.charting.charts.BarChart) findViewById(R.id.profile_analytics_graph);
+        profile_analytics_graph= findViewById(R.id.profile_analytics_graph);
         profile_analytics_graph.setNoDataText("No Data Available :(");
-        trendline_analytics_chart = (com.github.mikephil.charting.charts.LineChart) findViewById(R.id.trendline_analytics_chart);
-        followers_LineChart = (com.github.mikephil.charting.charts.LineChart) findViewById(R.id.followers_graph);
-        if (DataSingelton.data.get("follower_gain") == null){
+        trendline_analytics_chart = findViewById(R.id.trendline_analytics_chart);
+        followers_LineChart = findViewById(R.id.followers_graph);
+        if (DataSingelton.getData().get("follower_gain") == null){
             followers_LineChart.setNoDataText("Unavailable follower data");
         }
 
@@ -97,7 +93,7 @@ public class ProfileAnalytics extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        timeFetched = UtilFunctions.GetEndTimeList(DataSingelton.data);
+        timeFetched = UtilFunctions.GetEndTimeList(DataSingelton.getData());
 
         //TODO Setting data
         SetProfileDataText();
@@ -106,34 +102,49 @@ public class ProfileAnalytics extends AppCompatActivity {
         SetTrendlineDataChart();
     }
 
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void SetProfileDataText() {
-        avg_profile_views_value.setText(String.format("%.2f",UtilFunctions.getAVGof(DataSingelton.data.get("profile_views"))));
-        avg_impressions_value.setText(String.format("%.2f",UtilFunctions.getAVGof(DataSingelton.data.get("impressions"))));
-        avg_reach_value.setText(String.format("%.2f",UtilFunctions.getAVGof(DataSingelton.data.get("reach"))));
-        reach_percentage_value.setText(String.format("%.2f",UtilFunctions.getReachPercentage(DataSingelton.data)*100) + "%");
-
-        deviation_profile_views_value.setText(String.format("%.2f%%",UtilFunctions.getDeviationPercentage(DataSingelton.data.get("profile_views"))*100));
-        deviation_impressions_value.setText(String.format("%.2f%%",UtilFunctions.getDeviationPercentage(DataSingelton.data.get("impressions"))*100));
-        deviation_reach_value.setText(String.format("%.2f%%",UtilFunctions.getDeviationPercentage(DataSingelton.data.get("reach"))*100));
-
-        avg_follower_gain_value.setText(String.format("%.2f%%",UtilFunctions.getAVGof(DataSingelton.data.get("follower_gain"))));
-        deviation_follower_gain_value.setText(String.format("%.2f%%",UtilFunctions.getDeviationPercentage(DataSingelton.data.get("follower_gain"))));
+        avg_profile_views_value.setText(String.format("%.2f",
+                UtilFunctions.getAVGof(DataSingelton.getData().get("profile_views"))));
+        avg_impressions_value.setText(String.format("%.2f",
+                UtilFunctions.getAVGof(DataSingelton.getData().get("impressions"))));
+        avg_reach_value.setText(String.format("%.2f",
+                UtilFunctions.getAVGof(DataSingelton.getData().get("reach"))));
+        reach_percentage_value.setText(String.format("%.2f",
+                UtilFunctions.getReachPercentage(DataSingelton.getData())*100) + "%");
 
 
-        returning_users_value.setText(String.format("%.2f%%",UtilFunctions.getReturningUsersPercentage(DataSingelton.data)*100));
+        deviation_profile_views_value.setText(String.format("%.2f%%",
+                UtilFunctions.getDeviationPercentage(DataSingelton.getData().get("profile_views"))*100));
+        deviation_impressions_value.setText(String.format("%.2f%%",
+                UtilFunctions.getDeviationPercentage(DataSingelton.getData().get("impressions"))*100));
+        deviation_reach_value.setText(String.format("%.2f%%",
+                UtilFunctions.getDeviationPercentage(DataSingelton.getData().get("reach"))*100));
 
-        corr_profileViews_impressions_value.setText(String.format("%.2f%%",UtilFunctions.getCorrelationOf(DataSingelton.data.get("profile_views"),
-                                                                                                          DataSingelton.data.get("impressions"))*100));
-        corr_newReach_followerGain_value.setText(String.format("%.2f%%",UtilFunctions.getCorrelationOf(UtilFunctions.getUnfollowedReach(DataSingelton.data.get("reach"),DataSingelton.lifetimeData_onlineFollowers), //TODO
-                                                                                                       DataSingelton.data.get("follower_gain"))*100));
-        corr_profileViews_followerGain_value.setText(String.format("%.2f%%",UtilFunctions.getCorrelationOf(DataSingelton.data.get("profile_views"),
-                                                                                                           DataSingelton.data.get("follower_gain"))*100));
+
+        avg_follower_gain_value.setText(String.format("%.2f%%",
+                UtilFunctions.getAVGof(DataSingelton.getData().get("follower_gain"))));
+        deviation_follower_gain_value.setText(String.format("%.2f%%",
+                UtilFunctions.getDeviationPercentage(DataSingelton.getData().get("follower_gain"))));
+
+
+        returning_users_value.setText(String.format("%.2f%%",
+                UtilFunctions.getReturningUsersPercentage(DataSingelton.getData())*100));
+
+
+        corr_profileViews_impressions_value.setText(String.format("%.2f%%",
+                UtilFunctions.getCorrelationOf(DataSingelton.getData().get("profile_views"),DataSingelton.getData().get("impressions"))*100));
+        corr_newReach_followerGain_value.setText(String.format("%.2f%%",
+                UtilFunctions.getCorrelationOf(UtilFunctions.getUnfollowedReach(DataSingelton.getData().get("reach"),
+                        DataSingelton.getLifetimeData_onlineFollowers()),DataSingelton.getData().get("follower_gain"))*100));//TODO
+        corr_profileViews_followerGain_value.setText(String.format("%.2f%%",
+                UtilFunctions.getCorrelationOf(DataSingelton.getData().get("profile_views"),DataSingelton.getData().get("follower_gain"))*100));
     }
 
     private float barSpace = 0f;
     private float groupSpace = 0.4f;
     private void SetFollowersDataChart() {
-        followers_LineChart.setData(UtilFunctions.getFollowersDataChartEntry(DataSingelton.data));//todo dont forget to change reach to followers in the function
+        followers_LineChart.setData(UtilFunctions.getFollowersDataChartEntry(DataSingelton.getData()));//todo dont forget to change reach to followers in the function
         //for the X axis : ndiroha 3la 7ssab nhar :
         followers_LineChart.getAxisRight().setEnabled(false);
         XAxis followers_Xaxis = followers_LineChart.getXAxis();
@@ -158,7 +169,7 @@ public class ProfileAnalytics extends AppCompatActivity {
     }
     private void SetProfileDataChart() {
         //for profile Brief :
-        profile_analytics_graph.setData(UtilFunctions.getProfileDataChartEntry(DataSingelton.data));
+        profile_analytics_graph.setData(UtilFunctions.getProfileDataChartEntry(DataSingelton.getData()));
         //for the X axis : ndiroha 3la 7ssab nhar :
         profile_analytics_graph.getAxisRight().setEnabled(false);
         //Log.d(TAG, "run: size timefetched : "+timeFetched.size());
@@ -192,23 +203,35 @@ public class ProfileAnalytics extends AppCompatActivity {
         int[] rgb = new int[3];
         int polynomialOrder;
         //TODO : profile views
-        polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getMetricValueList(DataSingelton.data.get("profile_views")));
-        double[] coef_profileViews = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(DataSingelton.data.get("profile_views")),3);
+        polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getMetricValueList(
+                Objects.requireNonNull(DataSingelton.getData().get("profile_views"))
+        ));
+        double[] coef_profileViews = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(
+                Objects.requireNonNull(DataSingelton.getData().get("profile_views"))),3);
+        Log.d(TAG, "SetTrendlineDataChart: "+ Arrays.toString(coef_profileViews));
+
         rgb[0] = 255; rgb[1] = 179 ; rgb[2] = 215;
         SetLinedataSet(lineData, coef_profileViews,"Profile Views",rgb);
-        Log.d(TAG, "SetTrendlineDataChart: profile_views order : "+polynomialOrder);
+
 
         //TODO : reach
-        polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getMetricValueList(DataSingelton.data.get("reach")));
-        double[] coef_reach = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(DataSingelton.data.get("reach")),3);
+        polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getMetricValueList(
+                Objects.requireNonNull(DataSingelton.getData().get("reach"))
+        ));
+        double[] coef_reach = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(
+                Objects.requireNonNull(DataSingelton.getData().get("reach"))),3);
+        Log.d(TAG, "SetTrendlineDataChart: "+ Arrays.toString(coef_reach));
         rgb[0] = 224; rgb[1] = 179 ; rgb[2] = 255;
         SetLinedataSet(lineData, coef_reach,"Reach",rgb);
-        Log.d(TAG, "SetTrendlineDataChart: reach order : "+polynomialOrder);
+
 
         //TODO : impressions
-        polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getMetricValueList(DataSingelton.data.get("impressions")));
-        double[] coef_impressions = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(DataSingelton.data.get("impressions")),3);
-        Log.d(TAG, "SetTrendlineDataChart: impressions order : "+polynomialOrder);
+        polynomialOrder = UtilFunctions.getPolynomialOrder(UtilFunctions.getMetricValueList(
+                Objects.requireNonNull(DataSingelton.getData().get("impressions"))
+        ));
+        double[] coef_impressions = UtilFunctions.getPolynomialRegressionCoefficient(UtilFunctions.getMetricValueList(
+                Objects.requireNonNull(DataSingelton.getData().get("impressions"))),3);
+        Log.d(TAG, "SetTrendlineDataChart: "+ Arrays.toString(coef_impressions));
         rgb[0] = 161; rgb[1] = 168 ; rgb[2] = 255;
         SetLinedataSet(lineData, coef_impressions,"Impressions",rgb);
 

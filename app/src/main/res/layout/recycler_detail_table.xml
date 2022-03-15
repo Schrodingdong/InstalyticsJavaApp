@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/detail_table_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@drawable/recycler_hashtag_background"
+        android:backgroundTint="@color/white"
+        android:clickable="true">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/row"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_big"
+                android:layout_marginVertical="@dimen/margin"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:maxWidth="400dp"
+                app:layout_constraintBottom_toTopOf="@id/spacer"
+                app:layout_constraintLeft_toLeftOf="parent"
+
+                app:layout_constraintTop_toTopOf="parent">
+                <TextView
+                    android:id="@+id/date_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="date_value"
+                    android:textColor="@color/Text"
+                    android:textSize="@dimen/textSize_regular"
+                    android:layout_marginRight="@dimen/margin_big"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/reach_detail"
+                    android:layout_width="@dimen/recycler_value_size"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/margin"
+                    android:layout_marginLeft="@dimen/margin_big"
+                    android:text="r_value"
+                    android:textColor="@color/Text"
+                    android:textSize="@dimen/textSize_regular"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/date_detail"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/profile_views_detail"
+                    android:layout_width="@dimen/recycler_value_size"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/margin_Small"
+                    android:text="pv_value"
+                    android:textColor="@color/Text"
+                    android:textSize="@dimen/textSize_regular"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/reach_detail"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/websiteclicks_detail"
+                    android:layout_width="@dimen/recycler_value_size"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/margin_Small"
+                    android:text="w_value"
+                    android:textColor="@color/Text"
+                    android:textSize="@dimen/textSize_regular"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/profile_views_detail"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/orders_detail"
+                    android:layout_width="@dimen/recycler_value_size"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/margin_Small"
+                    android:text="o_value"
+                    android:textColor="@color/Text"
+                    android:textSize="@dimen/textSize_regular"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/websiteclicks_detail"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <View
+                android:id="@+id/spacer"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginHorizontal="@dimen/margin"
+                android:background="@color/insta_orangeBrightBright"
+                app:layout_constraintTop_toBottomOf="@id/row"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

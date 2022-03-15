@@ -5,4 +5,7 @@
     <string name="fb_login_protocol_scheme">fb230544005910820</string>
 
     <string name="textSize">14sp</string>
+    <string name="prediction_description">this prediction model needs at least 10 or more data entry.</string>
+    <string name="Interpretation_description">In this section we will determine a potential number of client that can buy something from your store/shop. It is also a place where you can store all your order data too !!</string>
+    <string name="dummyText">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.</string>
 </resources>

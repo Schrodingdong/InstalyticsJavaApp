@@ -23,8 +23,6 @@
         app:layout_constraintRight_toRightOf="parent"
         android:visibility="visible" />
 
-
-
     <!--    TODO: Top Handle-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/top_handle_widget"
@@ -56,6 +54,7 @@
         android:id="@+id/scrollable_area"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/top_handle_widget"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -76,15 +75,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingLeft="@dimen/padding"
-                android:paddingRight="@dimen/padding"
+                android:padding="@dimen/padding"
                 >
 
 <!--                TODO profile pic + name -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="@dimen/padding">
+                    android:layout_height="match_parent">
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -506,7 +503,7 @@
                         android:id="@+id/interpretation"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="300dp"
+                        android:minHeight="200dp"
                         android:background="@drawable/core_app_section_fill"
 
                         tools:layout_editor_absoluteX="5dp"
@@ -525,52 +522,20 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintLeft_toLeftOf="parent"/>
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/interpretation_text_layout"
-                            android:layout_width="match_parent"
+
+                        <TextView
+                            android:id="@+id/interpretation_description"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="@dimen/paddingAndCentering"
-                            android:layout_marginVertical="25dp"
-                            app:layout_constraintTop_toBottomOf="@id/interpretation_Name_button"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toRightOf="parent">
-                            <LinearLayout
-                                android:id="@+id/interpretation_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintLeft_toLeftOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent">
-                                <TextView
-                                    android:id="@+id/consistency_reach"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-
-                                    android:text="Reach Consistency"
-                                    android:textColor="@color/Text"
-                                    android:textSize="14dp"/>
-
-                            </LinearLayout>
-                            <LinearLayout
-                                android:id="@+id/interpretation_values"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:gravity="end"
-
-                                app:layout_constraintRight_toRightOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:layout_constraintBottom_toBottomOf="parent">
-                                <TextView
-                                    android:id="@+id/consistency_reach_value"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="xx.xx"
-                                    android:textColor="@color/Text"
-                                    android:textSize="14dp"/>
-                            </LinearLayout>
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                            android:padding="@dimen/padding"
+                            android:text="@string/Interpretation_description"
+                            android:textAlignment="center"
+                            android:textColor="@color/light_Text"
+                            android:textSize="14dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/interpretation_Name_button" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 

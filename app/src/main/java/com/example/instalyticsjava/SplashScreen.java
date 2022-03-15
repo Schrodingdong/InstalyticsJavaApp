@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.Window;
 
 import com.facebook.AccessToken;
-import com.facebook.core.Core;
 
 public class SplashScreen extends AppCompatActivity {
     private final String TAG = "SplashScreen";
